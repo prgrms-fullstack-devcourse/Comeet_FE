@@ -4,10 +4,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-brand-background: #1B1B1B;
-  --color-brand-primary: #99FF4A;
-  --color-brand-surface: #2C2C2C;
-  --color-brand-text: #7E7E7E;
+  --color-brand-background: oklch(0.2221 0 0);
+  --color-brand-primary: oklch(0.9042 0.2304 134.57);
+  --color-brand-surface: oklch(0.2931 0 0);
+  --color-brand-text: oklch(0.5931 0 0);
 }
 
 @theme inline {
