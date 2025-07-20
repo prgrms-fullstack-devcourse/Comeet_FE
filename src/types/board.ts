@@ -1,6 +1,6 @@
 export interface Post {
   id: number;
-  category: string;
+  categoryId: number;
   title: string;
   author: string;
   date: string;

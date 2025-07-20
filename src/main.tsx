@@ -12,8 +12,6 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        // 기본 /board 경로는 /board/all 로 리디렉션하거나,
-        // BoardPage에서 category가 없을 때 'all'을 기본값으로 사용하도록 처리
         index: true,
         element: <BoardPage />,
       },

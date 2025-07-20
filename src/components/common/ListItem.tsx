@@ -2,17 +2,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle } from "lucide-react";
 import type { Post } from "@/types/board";
+import { BOARD_CATEGORIES } from "@/constants/board";
 
 interface ListItemProps {
   post: Post;
 }
 
 export const ListItem = ({ post }: ListItemProps) => {
+  const categoryLabel =
+    BOARD_CATEGORIES.find((c) => c.value === post.categoryId.toString())
+      ?.label || "";
+
   return (
     <Card className="bg-brand-surface border-none text-white hover:bg-brand-surface/50 transition-colors">
       <CardHeader>
         <Badge className="w-fit p-0 text-left bg-transparent border-none text-brand-primary">
-          {post.category}
+          {categoryLabel}
         </Badge>
         <CardTitle className="mt-2">{post.title}</CardTitle>
       </CardHeader>

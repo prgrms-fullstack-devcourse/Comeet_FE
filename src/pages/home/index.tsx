@@ -1,41 +1,36 @@
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
+import { useParams } from "react-router-dom";
 import type { Post } from "@/types/board";
+import { fetchPosts } from "@/lib/api";
 import { BoardTabs } from "@/components/common/BoardTabs";
 
-const posts: Post[] = [
-  {
-    id: 1,
-    category: "자유",
-    title: "오늘 날씨 좋네요!",
-    author: "하늘구경",
-    date: "2024.07.29",
-    likes: 12,
-    comments: 5,
-  },
-  {
-    id: 2,
-    category: "질문",
-    title: "리액트 Hook 질문 있습니다.",
-    author: "궁금해요",
-    date: "2024.07.28",
-    likes: 3,
-    comments: 2,
-  },
-  {
-    id: 3,
-    category: "프로젝트",
-    title: "사이드 프로젝트 팀원 구합니다!",
-    author: "열정맨",
-    date: "2024.07.27",
-    likes: 25,
-    comments: 18,
-  },
-];
-
 export const BoardPage = () => {
+  const { category = "all" } = useParams<{ category: string }>();
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const fetchedPosts = await fetchPosts(category);
+        setPosts(fetchedPosts);
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPosts();
+  }, [category]);
+
   return (
     <div className="dark text-foreground">
-      <BoardTabs posts={posts} />
+      <BoardTabs posts={posts} currentCategory={category} />
       <button className="absolute bottom-20 right-4 bg-brand-primary text-brand-background rounded-full p-4 hover:bg-brand-primary/90">
         <Plus className="size-8" />
       </button>
