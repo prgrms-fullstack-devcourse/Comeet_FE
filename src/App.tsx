@@ -1,10 +1,10 @@
+import { Outlet } from "react-router-dom";
 import GlobalLayout from "./components/layout/GlobalLayout";
-import { BoardPage } from "./pages/Board";
 
 function App() {
   return (
     <GlobalLayout variant="black">
-      <BoardPage />
+      <Outlet />
     </GlobalLayout>
   );
 }
