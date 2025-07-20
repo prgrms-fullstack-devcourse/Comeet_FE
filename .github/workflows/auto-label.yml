@@ -24,14 +24,14 @@ jobs:
             });
 
             const labelMap = {
-              'feat': 'feature',
-              'fix': 'bugfix',
-              'refactor': 'refactor',
-              'style': 'style',
-              'docs': 'docs',
-              'test': 'test',
-              'chore': 'chore',
-              'deploy': 'deploy'
+              'feat': '✨feature',
+              'fix': '🐞bugfix',
+              'refactor': '🔄refactor',
+              'style': '🎨style',
+              'docs': '📚docs',
+              'test': '✅test',
+              'chore': '⚙️chore',
+              'deploy': '⬆️deploy',
             };
 
             const labels = new Set();
