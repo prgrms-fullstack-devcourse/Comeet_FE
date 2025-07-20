@@ -9,7 +9,7 @@ interface ListItemProps {
 
 export const ListItem = ({ post }: ListItemProps) => {
   return (
-    <Card className="bg-brand-surface border-none text-white">
+    <Card className="bg-brand-surface border-none text-white hover:bg-brand-surface/50 transition-colors">
       <CardHeader>
         <Badge className="w-fit p-0 text-left bg-transparent border-none text-brand-primary">
           {post.category}
