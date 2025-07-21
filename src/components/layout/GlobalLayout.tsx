@@ -1,33 +1,28 @@
 import type { ReactNode } from "react";
+import Header from "./Header";
+import BottomNavigation from "./BottomNavigation";
 
 interface GlobalLayoutProps {
   children: ReactNode;
   showHeader?: boolean;
-  showFooter?: boolean;
-  variant?: 'white' | 'black';
+  showBottomNavigation?: boolean;
+  headerTitle?: string;
 }
 
 function GlobalLayout({
   children,
   showHeader = true,
-  showFooter = true,
-  variant = 'white',
+  showBottomNavigation = true,
+  headerTitle
 }: GlobalLayoutProps) {
-  const backgroundClass = variant === 'black' ? 'bg-brand-background' : 'bg-white';
   return (
     <div className="min-h-screen bg-slate-100 flex justify-center">
-      <div className={`w-[480px] ${backgroundClass} flex flex-col`}>
-        {showHeader && (
-          <header className="w-full border-b border-border h-14">
-          </header>
-        )}
+      <div className={`w-[480px] bg-brand-background flex flex-col`}>
+        {showHeader && <Header title={headerTitle} />}
         <main className="flex-1 p-4">
           {children}
         </main>
-        {showFooter && (
-          <footer className="w-full border-t border-border h-14">
-          </footer>
-        )}
+        {showBottomNavigation && <BottomNavigation />}
       </div>
     </div >
   );
