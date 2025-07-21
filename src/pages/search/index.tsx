@@ -1,0 +1,45 @@
+import { useState } from 'react';
+import GlobalLayout from '@/components/layout/GlobalLayout';
+import RecentSearchList from '@/components/search/RecentSearchList';
+import SearchHeader from '@/components/search/SearchHeader';
+
+export default function SearchPage() {
+  const [query, setQuery] = useState('');
+  const [recentSearches, setRecentSearches] = useState([
+    '이전 검색 결과 1',
+    '이전 검색 결과 2',
+    '이전 검색 결과 3'
+  ]);
+
+  const handleRemoveSearch = (index: number) => {
+    setRecentSearches(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      console.log('검색:', query);
+    }
+  };
+
+  return (
+    <GlobalLayout showHeader={false} showBottomNavigation={false}>
+      <div className="flex flex-col h-full">
+        <SearchHeader
+          query={query}
+          onQueryChange={setQuery}
+          onSubmit={handleSubmit}
+          onBack={() => { }}
+        />
+
+        <main className="flex-1 overflow-auto p-2">
+          <RecentSearchList
+            searches={recentSearches}
+            onSearchClick={setQuery}
+            onRemove={handleRemoveSearch}
+          />
+        </main>
+      </div>
+    </GlobalLayout>
+  );
+}
