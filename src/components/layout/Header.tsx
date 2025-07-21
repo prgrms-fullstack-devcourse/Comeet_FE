@@ -6,7 +6,7 @@ interface HeaderProps {
 }
 
 export default function Header({ title = "COMEET" }: HeaderProps) {
-  const iconButtonClass = "mx-2 text-white hover:bg-white/10 hover:text-white cursor-pointer";
+  const iconButtonClass = "mx-2 text-white hover:bg-brand-surface hover:text-brand-primary cursor-pointer";
 
   return (
     <header className="w-full border-b border-brand-surface flex items-center justify-between h-14">

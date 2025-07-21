@@ -13,10 +13,15 @@ export default function BottomNavigation() {
             key={item.id}
             variant="ghost"
             onClick={() => { }}
-            className={`flex-1 h-full rounded-none cursor-pointer ${isActive
-              ? 'text-brand-primary hover:text-white hover:bg-white/10'
-              : 'text-white hover:text-white hover:bg-white/10'
-              }`}
+            className={`
+              flex-1 
+              h-full 
+              rounded-none 
+              hover:text-brand-primary 
+              hover:bg-brand-surface 
+              cursor-pointer
+              ${isActive ? 'text-brand-primary' : 'text-white'}
+            `}
             aria-label={`${item.id} 페이지로 이동`}
           >
             <Icon />
