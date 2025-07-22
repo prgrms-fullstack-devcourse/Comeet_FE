@@ -27,11 +27,11 @@ export const ListItem = ({ post }: ListItemProps) => {
         </span>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1">
-            <Heart className="size-4" />
+            <Heart className="size-4" aria-label="좋아요" />
             <span className="w-3">{post.likes}</span>
           </div>
           <div className="flex items-center space-x-1">
-            <MessageCircle className="size-4" />
+            <MessageCircle className="size-4" aria-label="댓글" />
             <span className="w-3">{post.comments}</span>
           </div>
         </div>

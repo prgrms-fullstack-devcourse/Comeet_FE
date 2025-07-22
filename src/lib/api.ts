@@ -72,8 +72,6 @@ const ALL_POSTS: Post[] = [
  * @param categoryId - 'all' 또는 '1', '2', '3', '4'
  */
 export const fetchPosts = (categoryId: string): Promise<Post[]> => {
-  console.log(`(API) Fetching posts for category ID: ${categoryId}`);
-
   if (categoryId === "all") {
     return Promise.resolve(ALL_POSTS);
   } else {

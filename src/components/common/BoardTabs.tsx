@@ -26,7 +26,7 @@ export const BoardTabs = ({ posts, currentCategory }: BoardTabsProps) => {
           <TabsTrigger
             key={tab.value}
             value={tab.value}
-            className="rounded-full border-brand-surface data-[state=active]:!bg-transparent data-[state=active]:!text-brand-primary data-[state=active]:!border-2 data-[state=active]:!border-brand-primary">
+            className="rounded-full border-brand-surface text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-brand-primary data-[state=active]:border-2 data-[state=active]:border-brand-primary">
             {tab.label}
           </TabsTrigger>
         ))}
