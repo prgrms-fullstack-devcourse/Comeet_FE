@@ -5,6 +5,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { LoginPage } from "./pages/auth/LoginPage.tsx";
 import { BoardPage } from "./pages/home/index.tsx";
+import { ExplorePage } from "./pages/explore/index.tsx";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
       {
         path: "board/:category",
         element: <BoardPage />,
+      },
+      {
+        path: "explore",
+        element: <ExplorePage />,
       },
     ],
   },
