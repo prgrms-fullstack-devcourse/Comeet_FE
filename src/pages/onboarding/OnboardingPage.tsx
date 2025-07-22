@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import GlobalLayout from '@/components/layout/GlobalLayout';
-import { OnboardingStep1 } from '@/components/onboarding/OnboardingStep1';
-import { OnboardingStep2 } from '@/components/onboarding/OnboardingStep2';
-import { OnboardingStep3 } from '@/components/onboarding/OnboardingStep3';
-import { OnboardingStep4 } from '@/components/onboarding/OnboardingStep4';
+import { OnboardingStep1 } from '@/pages/onboarding/__components/OnboardingStep1';
+import { OnboardingStep2 } from '@/pages/onboarding/__components/OnboardingStep2';
+import { OnboardingStep3 } from '@/pages/onboarding/__components/OnboardingStep3';
+import { OnboardingStep4 } from '@/pages/onboarding/__components/OnboardingStep4';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export interface OnboardingData {
