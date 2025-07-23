@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
 
+permissions:
+  issues: write
+  pull-requests: write
+
 jobs:
   auto-label:
     runs-on: ubuntu-latest
@@ -20,14 +24,14 @@ jobs:
             });
 
             const labelMap = {
-              'feat': 'feature',
-              'fix': 'bugfix',
-              'refactor': 'refactor',
-              'style': 'style',
-              'docs': 'docs',
-              'test': 'test',
-              'chore': 'chore',
-              'deploy': 'deploy'
+              'feat': '✨feature',
+              'fix': '🐞bugfix',
+              'refactor': '🔄refactor',
+              'style': '🎨style',
+              'docs': '📚docs',
+              'test': '✅test',
+              'chore': '⚙️chore',
+              'deploy': '⬆️deploy',
             };
 
             const labels = new Set();
@@ -44,7 +48,7 @@ jobs:
             }
 
             if (labels.size > 0) {
-              await github.issues.addLabels({
+              await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: prNumber,
