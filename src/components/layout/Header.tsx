@@ -13,7 +13,7 @@ export default function Header({ title = "COMEET" }: HeaderProps) {
       <div>
         <Button
           variant="ghost"
-          onClick={() => { }}
+          onClick={() => { }} // TODO: React Router 연동 후 navigate(-1) 기능 추가
           className={iconButtonClass}
           aria-label="뒤로가기"
         >
@@ -28,7 +28,7 @@ export default function Header({ title = "COMEET" }: HeaderProps) {
       <div>
         <Button
           variant="ghost"
-          onClick={() => { }}
+          onClick={() => { }} // TODO: React Router 연동 후 navigate('/search') 기능 연결
           className={iconButtonClass}
           aria-label="검색"
         >
