@@ -18,6 +18,7 @@ export default function SearchPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
+      // TODO: 실제 검색 API 연동 후 검색 결과 페이지로 이동 또는 결과 표시
       console.log('검색:', query);
     }
   };
@@ -29,6 +30,7 @@ export default function SearchPage() {
           query={query}
           onQueryChange={setQuery}
           onSubmit={handleSubmit}
+          // TODO: React Router useNavigate 훅 추가 후 navigate(-1) 기능 구현
           onBack={() => { }}
         />
 

@@ -23,7 +23,7 @@ export default function RecentSearchList({
   return (
     <>
       {searches.map((search, index) => (
-        <div key={index} className="flex items-center justify-between">
+        <div key={search} className="flex items-center justify-between">
           <button
             onClick={() => onSearchClick(search)}
             className="text-white hover:text-brand-primary cursor-pointer"
