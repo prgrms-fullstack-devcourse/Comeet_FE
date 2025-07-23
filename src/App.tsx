@@ -1,3 +1,4 @@
+import { Outlet } from "react-router-dom";
 import GlobalLayout from "./components/layout/GlobalLayout";
 import { OnboardingPage } from "./pages/onboarding/OnboardingPage";
 
@@ -19,8 +20,8 @@ function App() {
   }
 
   return (
-    <GlobalLayout>
-      {content}
+    <GlobalLayout variant="black">
+      <Outlet />
     </GlobalLayout>
   );
 }
