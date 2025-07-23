@@ -47,9 +47,12 @@ export const DeveloperProfileCard = ({
           </CardHeader>
           <CardContent className="p-0 mt-2">
             <div className="flex flex-wrap gap-2">
-              {developer.skills.map((skill) => (
-                <Badge key={skill} variant="secondary">
-                  {skill}
+              {developer.stacks.map((stack, index) => (
+                <Badge
+                  key={`${stack}-${index}`}
+                  variant="outline"
+                  className="rounded-full bg-brand-surface border-brand-primary text-brand-primary">
+                  {stack}
                 </Badge>
               ))}
             </div>

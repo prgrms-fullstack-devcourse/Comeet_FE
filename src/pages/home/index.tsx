@@ -1,26 +1,40 @@
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
-import { useParams } from "react-router-dom";
-import type { Post } from "@/types/board";
-import { fetchPosts } from "@/lib/api";
-import { BoardTabs } from "@/components/common/BoardTabs";
+import { useParams, useNavigate } from "react-router-dom";
+import type { Post } from "../../types/board";
+import { fetchPosts } from "../../lib/api";
+import { AppTabs } from "../../components/common/AppTabs";
+import { ListItem } from "./_components/ListItem";
+import { BOARD_CATEGORIES, BOARD_CATEGORY_VALUES } from "../../constants/board";
+import type { UICategory } from "../../constants/board";
+import { Button } from "@/components/ui/button";
 
 export const BoardPage = () => {
   const { category = "all" } = useParams<{ category: string }>();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    const isValidCategory = (cat: string): cat is UICategory => {
+      return (BOARD_CATEGORY_VALUES as readonly string[]).includes(cat);
+    };
+
     const loadPosts = async () => {
       setIsLoading(true);
       setError(null);
-      try {
-        const fetchedPosts = await fetchPosts(category);
-        setPosts(fetchedPosts);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
+      if (isValidCategory(category)) {
+        try {
+          const fetchedPosts = await fetchPosts(category);
+          setPosts(fetchedPosts);
+        } catch (err) {
+          setError(err as Error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setError(new Error("잘못된 카테고리입니다."));
         setIsLoading(false);
       }
     };
@@ -28,12 +42,32 @@ export const BoardPage = () => {
     loadPosts();
   }, [category]);
 
+  const handleTabChange = (value: string) => {
+    navigate(`/board/${value}`);
+  };
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (error) return <div>에러 발생: {error.message}</div>;
+
   return (
     <div className="dark text-foreground">
-      <BoardTabs posts={posts} currentCategory={category} />
-      <button className="absolute bottom-20 right-4 bg-brand-primary text-brand-background rounded-full p-4 hover:bg-brand-primary/90">
+      <AppTabs
+        tabs={BOARD_CATEGORIES}
+        value={category}
+        onValueChange={handleTabChange}
+        listClassName="grid-cols-5 gap-2"
+        className="-mx-4"
+      />
+      <div className="mt-4 space-y-4">
+        {posts.map((post) => (
+          <ListItem key={post.id} post={post} />
+        ))}
+      </div>
+      <Button
+        size="icon"
+        className="absolute bottom-20 right-4 rounded-full w-16 h-16 bg-brand-primary text-brand-background hover:bg-brand-primary/90">
         <Plus className="size-8" />
-      </button>
+      </Button>
     </div>
   );
 };

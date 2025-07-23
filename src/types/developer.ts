@@ -3,7 +3,7 @@ export interface Developer {
   nickname: string;
   distance: string;
   position: string;
-  skills: string[];
+  stacks: string[];
   experience: string;
   image: string;
   category: "nearby" | "popular" | "favorite";
