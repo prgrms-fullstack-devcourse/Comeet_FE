@@ -8,7 +8,16 @@ import { usePost, useTogglePostLike, useAddComment } from "@/hooks/usePost";
 
 export function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
-  const { data: post, isLoading, isError, error } = usePost(postId!);
+
+  if (!postId) {
+    return (
+      <GlobalLayout variant="black">
+        <div className="p-4 text-white">유효하지 않은 게시글 ID입니다.</div>
+      </GlobalLayout>
+    );
+  }
+
+  const { data: post, isLoading, isError, error } = usePost(postId);
   const { mutate: toggleLike, isPending: isLikePending } = useTogglePostLike();
   const { mutate: addNewComment, isPending: isAddingComment } = useAddComment();
 
@@ -19,7 +28,6 @@ export function PostDetailPage() {
       </GlobalLayout>
     );
   }
-
   if (isError) {
     return (
       <GlobalLayout variant="black">
@@ -46,21 +54,16 @@ export function PostDetailPage() {
         <div className="flex-grow overflow-y-auto px-4">
           <PostContent
             post={post}
-            onLikeClick={() => toggleLike(postId!)}
+            onLikeClick={() => toggleLike(postId)}
             isLikePending={isLikePending}
           />
           <CommentSection
             comments={post.comments}
-            onAddNewComment={(content: string) =>
-              addNewComment({ postId: postId!, content })
-            }
             onToggleCommentLike={handleToggleCommentLike}
           />
         </div>
         <CommentForm
-          onSubmit={(content: string) =>
-            addNewComment({ postId: postId!, content })
-          }
+          onSubmit={(content: string) => addNewComment({ postId, content })}
           isPending={isAddingComment}
         />
       </div>

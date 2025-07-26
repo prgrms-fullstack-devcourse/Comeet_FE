@@ -4,7 +4,6 @@ import { CommentItem } from "./CommentItem";
 interface CommentSectionProps {
   comments: Comment[];
   onToggleCommentLike: (commentId: number) => void;
-  onAddNewComment: (content: string) => void;
 }
 
 export function CommentSection({
