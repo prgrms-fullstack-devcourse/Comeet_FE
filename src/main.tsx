@@ -7,6 +7,14 @@ import { LoginPage } from "./pages/auth/LoginPage.tsx";
 import { BoardPage } from "./pages/home/index.tsx";
 import { MyPage } from "./pages/my/index.tsx";
 import { DeveloperPage } from "./pages/developer/index.tsx";
+import { ExplorePage } from "./pages/explore/index.tsx";
+
+async function enableMocking() {
+  if (import.meta.env.DEV) {
+    const { worker } = await import("./mocks/browser.ts");
+    return worker.start();
+  }
+}
 
 const router = createBrowserRouter([
   {
@@ -20,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "board/:category",
         element: <BoardPage />,
+      },
+      {
+        path: "explore",
+        element: <ExplorePage />,
       },
       {
         path: "my",
@@ -37,8 +49,10 @@ const router = createBrowserRouter([
   },
 ]);
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>
-);
+enableMocking().then(() => {
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>
+  );
+});
