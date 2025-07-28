@@ -19,8 +19,11 @@ export const ProfileSection = ({ isEditable = false }: ProfileSectionProps) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
+
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        if (typeof reader.result === "string") {
+          setImagePreview(reader.result);
+        }
       };
       reader.readAsDataURL(file);
     }
