@@ -14,8 +14,10 @@ export const DeveloperPage = () => {
   };
 
   return (
-    <div className="dark text-foreground flex flex-col items-center">
-      <ProfileSection />
+    <div className="dark text-foreground flex flex-col -mx-4">
+      <div className="px-4">
+        <ProfileSection />
+      </div>
       <AppTabs
         tabs={DEVELOPER_TABS}
         value={activeTab}
@@ -23,7 +25,7 @@ export const DeveloperPage = () => {
         listClassName="grid-cols-2"
         className="w-full mt-8"
       />
-      <div className="w-full mt-4 p-4 text-white">
+      <div className="w-full mt-4 text-white px-4">
         {activeTab === "profile" && <Profile />}
         {activeTab === "posts" && <Posts />}
       </div>
