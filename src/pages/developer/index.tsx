@@ -10,7 +10,9 @@ export const DeveloperPage = () => {
   const [activeTab, setActiveTab] = useState<DeveloperTabValue>("profile");
 
   const handleTabChange = (value: string) => {
-    setActiveTab(value as DeveloperTabValue);
+    if (DEVELOPER_TABS.some((tab) => tab.value === value)) {
+      setActiveTab(value as DeveloperTabValue);
+    }
   };
 
   return (
