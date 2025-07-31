@@ -6,25 +6,28 @@ interface Tab {
   label: string;
 }
 
-interface AppTabsProps {
-  tabs: readonly Tab[];
-  value: string;
-  onValueChange: (value: string) => void;
+interface AppTabsProps<T extends string> {
+  tabs: readonly (Tab & { value: T })[];
+  value: T;
+  onValueChange: (value: T) => void;
   listClassName?: string;
   triggerClassName?: string;
   className?: string;
 }
 
-export const AppTabs = ({
+export const AppTabs = <T extends string>({
   tabs,
   value,
   onValueChange,
   listClassName,
   triggerClassName,
   className,
-}: AppTabsProps) => {
+}: AppTabsProps<T>) => {
   return (
-    <Tabs value={value} onValueChange={onValueChange} className={cn(className)}>
+    <Tabs
+      value={value}
+      onValueChange={(value: string) => onValueChange(value as T)}
+      className={cn(className)}>
       <TabsList
         className={cn(
           "grid w-full bg-brand-background rounded-none p-0 border-b-2 border-brand-surface",

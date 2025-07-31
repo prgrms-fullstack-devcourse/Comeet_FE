@@ -9,10 +9,8 @@ import Profile from "./_components/Profile.tsx";
 export const DeveloperPage = () => {
   const [activeTab, setActiveTab] = useState<DeveloperTabValue>("profile");
 
-  const handleTabChange = (value: string) => {
-    if (DEVELOPER_TABS.some((tab) => tab.value === value)) {
-      setActiveTab(value as DeveloperTabValue);
-    }
+  const handleTabChange = (value: DeveloperTabValue) => {
+    setActiveTab(value);
   };
 
   return (
