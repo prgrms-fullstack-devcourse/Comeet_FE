@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AppTabs } from "@/components/common/AppTabs";
-import { ProfileSection } from "@/components/common/ProfileSection";
+import { ProfileSection } from "@/components/profile/ProfileSection.tsx";
 import type { DeveloperTabValue } from "@/constants/profile";
 import { DEVELOPER_TABS } from "@/constants/profile";
 import Posts from "./_components/Posts.tsx";

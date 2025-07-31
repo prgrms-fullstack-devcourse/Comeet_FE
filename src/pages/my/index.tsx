@@ -1,4 +1,4 @@
-import { ProfileSection } from "@/components/common/ProfileSection";
+import { ProfileSection } from "@/components/profile/ProfileSection";
 import { ChevronRight } from "lucide-react";
 import { MENU_ITEMS, type MenuItemId } from "@/constants/my";
 
