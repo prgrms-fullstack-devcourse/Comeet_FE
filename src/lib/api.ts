@@ -37,3 +37,19 @@ export const fetchStacks = async (): Promise<Stack[]> => {
   }
   return response.json();
 };
+
+export const fetchLogin = async (code: string) => {
+  const response = await fetch(`/api/auth/sign-in?code=${encodeURIComponent(code)}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitHub 로그인 실패: ${response.status}`);
+  }
+
+  return {
+    status: response.status,
+    data: await response.json()
+  };
+};

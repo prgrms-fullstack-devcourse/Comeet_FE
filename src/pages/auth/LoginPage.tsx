@@ -2,11 +2,30 @@ import GlobalLayout from "@/components/layout/GlobalLayout";
 import { Button } from "@/components/ui/button";
 
 export function LoginPage() {
+  const handleGitHubLogin = async () => {
+    try {
+      const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;;
+      const redirectUri = `${window.location.origin}/callback`;
+      const scope = 'user:email';
+      const state = Math.random().toString(36).substring(7);
+
+      const githubAuthUrl = `https://github.com/login/oauth/authorize?` +
+        `client_id=${clientId}&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+        `scope=${scope}&` +
+        `state=${state}`;
+
+      sessionStorage.setItem('github_oauth_state', state);
+      window.location.href = githubAuthUrl;
+    } catch (error) {
+      console.error('GitHub 로그인 오류:', error);
+    }
+  };
+
   return (
     <GlobalLayout
       showHeader={false}
-      showFooter={false}
-      variant="black"
+      showBottomNavigation={false}
     >
       <div className="flex flex-col justify-between min-h-full p-8">
         <section className="mt-20">
@@ -20,6 +39,7 @@ export function LoginPage() {
 
         <section className="mb-4">
           <Button
+            onClick={handleGitHubLogin}
             className="
               w-full
               h-12
