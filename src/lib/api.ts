@@ -3,6 +3,7 @@ import type { UICategory } from "@/constants/board";
 import type { Developer } from "@/types/developer";
 import type { ExploreTabValue } from "@/constants/explore";
 import type { PositionCategory, Stack } from "@/types/filter";
+import type { FetchLoginResponse } from "@/types/auth";
 
 export const fetchPosts = async (category: UICategory): Promise<Post[]> => {
   const response = await fetch(`/api/posts?category=${category}`);
@@ -38,18 +39,31 @@ export const fetchStacks = async (): Promise<Stack[]> => {
   return response.json();
 };
 
-export const fetchLogin = async (code: string) => {
+export const fetchLogin = async (code: string): Promise<FetchLoginResponse> => {
   const response = await fetch(`/api/auth/sign-in?code=${encodeURIComponent(code)}`, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Accept': 'application/json'
+    },
   });
 
   if (!response.ok) {
     throw new Error(`GitHub 로그인 실패: ${response.status}`);
   }
 
-  return {
-    status: response.status,
-    data: await response.json()
-  };
+  const data = await response.json();
+
+  if (response.status === 200) {
+    return {
+      status: 200,
+      token: data.token
+    };
+  } else if (response.status === 210) {
+    return {
+      status: 210,
+      githubId: data.githubId
+    };
+  } else {
+    throw new Error(`예상하지 못한 응답 상태: ${response.status}`);
+  }
 };

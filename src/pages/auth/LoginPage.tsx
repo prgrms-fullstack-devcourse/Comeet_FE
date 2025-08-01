@@ -2,24 +2,22 @@ import GlobalLayout from "@/components/layout/GlobalLayout";
 import { Button } from "@/components/ui/button";
 
 export function LoginPage() {
-  const handleGitHubLogin = async () => {
-    try {
-      const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;;
-      const redirectUri = `${window.location.origin}/callback`;
-      const scope = 'user:email';
-      const state = Math.random().toString(36).substring(7);
+  const handleGitHubLogin = () => {
+    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+    const redirectUri = `${window.location.origin}/callback`;
+    const scope = 'user:email';
+    const state = Math.random().toString(36).substring(7);
 
-      const githubAuthUrl = `https://github.com/login/oauth/authorize?` +
-        `client_id=${clientId}&` +
-        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-        `scope=${scope}&` +
-        `state=${state}`;
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      scope: scope,
+      state: state,
+    });
+    const githubAuthUrl = `https://github.com/login/oauth/authorize?${params.toString()}`;
 
-      sessionStorage.setItem('github_oauth_state', state);
-      window.location.href = githubAuthUrl;
-    } catch (error) {
-      console.error('GitHub 로그인 오류:', error);
-    }
+    sessionStorage.setItem('github_oauth_state', state);
+    window.location.href = githubAuthUrl;
   };
 
   return (
@@ -49,6 +47,7 @@ export function LoginPage() {
               text-lg
               font-bold 
               gap-5
+              cursor-pointer
             "
           >
             <img src="/github-black.svg" alt="Github 로고" className="w-8 h-auto" />
