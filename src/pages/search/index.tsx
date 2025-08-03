@@ -1,5 +1,4 @@
 import { useState } from "react";
-import GlobalLayout from "@/components/layout/GlobalLayout";
 import RecentSearchList from "@/components/search/RecentSearchList";
 import SearchHeader from "@/components/search/SearchHeader";
 
@@ -24,24 +23,22 @@ export default function SearchPage() {
   };
 
   return (
-    <GlobalLayout showHeader={false} showBottomNavigation={false}>
-      <div className="flex flex-col h-full">
-        <SearchHeader
-          query={query}
-          onQueryChange={setQuery}
-          onSubmit={handleSubmit}
-          // TODO: React Router useNavigate 훅 추가 후 navigate(-1) 기능 구현
-          onBack={() => {}}
-        />
+    <div className="flex flex-col h-full">
+      <SearchHeader
+        query={query}
+        onQueryChange={setQuery}
+        onSubmit={handleSubmit}
+        // TODO: React Router useNavigate 훅 추가 후 navigate(-1) 기능 구현
+        onBack={() => {}}
+      />
 
-        <main className="flex-1 overflow-auto p-2">
-          <RecentSearchList
-            searches={recentSearches}
-            onSearchClick={setQuery}
-            onRemove={handleRemoveSearch}
-          />
-        </main>
-      </div>
-    </GlobalLayout>
+      <main className="flex-1 overflow-auto p-2">
+        <RecentSearchList
+          searches={recentSearches}
+          onSearchClick={setQuery}
+          onRemove={handleRemoveSearch}
+        />
+      </main>
+    </div>
   );
 }
