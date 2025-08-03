@@ -1,6 +1,6 @@
 import { useState } from "react";
-import RecentSearchList from "@/components/search/RecentSearchList";
-import SearchHeader from "@/components/search/SearchHeader";
+import RecentSearchList from "@/pages/search/_components/RecentSearchList";
+import SearchHeader from "@/pages/search/_components/SearchHeader";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -31,8 +31,7 @@ export default function SearchPage() {
         // TODO: React Router useNavigate 훅 추가 후 navigate(-1) 기능 구현
         onBack={() => {}}
       />
-
-      <main className="flex-1 overflow-auto p-2">
+      <main className="flex-1 overflow-auto">
         <RecentSearchList
           searches={recentSearches}
           onSearchClick={setQuery}
