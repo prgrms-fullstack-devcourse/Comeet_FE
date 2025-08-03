@@ -10,6 +10,8 @@ import { DeveloperPage } from "./pages/developer/index.tsx";
 import { ExplorePage } from "./pages/explore/index.tsx";
 import { OnboardingPage } from "./pages/onboarding/OnboardingPage.tsx";
 import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
+import ChatPage from "./pages/chat/index.tsx";
+import SearchPage from "./pages/search/index.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -28,12 +30,20 @@ const router = createBrowserRouter([
         element: <BoardPage />,
       },
       {
+        path: "board",
+        element: <BoardPage />,
+      },
+      {
         path: "board/:category",
         element: <BoardPage />,
       },
       {
         path: "explore",
         element: <ExplorePage />,
+      },
+      {
+        path: "chat",
+        element: <ChatPage />,
       },
       {
         path: "my",
@@ -54,6 +64,10 @@ const router = createBrowserRouter([
       {
         path: "onboarding",
         element: <OnboardingPage />,
+      },
+      {
+        path: "search",
+        element: <SearchPage />,
       },
     ],
   },
