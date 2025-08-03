@@ -170,7 +170,9 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
   const handleInterestToggle = (topicId: number) => {
     const newInterestIds = selectedInterestIds.includes(topicId)
       ? selectedInterestIds.filter((id) => id !== topicId)
-      : [...selectedInterestIds, topicId];
+      : selectedInterestIds.length < 3
+      ? [...selectedInterestIds, topicId]
+      : selectedInterestIds;
     setSelectedInterestIds(newInterestIds);
   };
 
@@ -191,21 +193,19 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
   };
 
   return (
-    <div className="flex flex-col min-h-[75vh]">
+    <div className="dark flex flex-col min-h-[75vh]">
       <div className="flex-grow space-y-8">
         <div className="space-y-3">
           <Label>포지션</Label>
           <Accordion
             type="single"
             collapsible
-            className="w-full border rounded-md border-gray-700"
-          >
+            className="w-full border rounded-md border-brand-surface">
             {POSITION_DATA.map((cat) => (
               <AccordionItem
                 key={cat.category}
                 value={cat.category}
-                className="px-4 border-b-gray-700 last:border-b-0"
-              >
+                className="px-4 border-b-brand-surface last:border-b-0">
                 <AccordionTrigger className="hover:no-underline">
                   {cat.category}
                 </AccordionTrigger>
@@ -217,14 +217,13 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
                         variant="outline"
                         onClick={() => setPosition(pos.id)}
                         className={cn(
-                          "h-auto justify-start text-left whitespace-normal border-gray-600 bg-gray-800",
+                          "h-auto justify-start text-left whitespace-normal border-transparent bg-brand-surface",
                           position === pos.id &&
-                            "border-lime-400 text-lime-400 border-2"
-                        )}
-                      >
+                            "border-brand-primary text-brand-primary border-1"
+                        )}>
                         <div className="flex flex-col">
                           <span className="font-bold">{pos.name}</span>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-brand-text">
                             {pos.description}
                           </span>
                         </div>
@@ -237,7 +236,7 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
           </Accordion>
         </div>
 
-        <div className="space-y-3">
+        <div className="w-full space-y-3">
           <Label>기술 스택 / 분야</Label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -245,29 +244,29 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
-                className="w-full justify-between bg-gray-800 border-gray-600 hover:bg-gray-700 hover:text-white"
-              >
+                className="w-full justify-between bg-brand-surface border-transparent hover:bg-brand-primary hover:text-white">
                 {selectedStackIds.length > 0
                   ? `${selectedStackIds.length}개 선택됨`
                   : "스택을 선택하세요..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[380px] p-0 bg-gray-900 border-gray-700 text-white">
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 border-transparent">
               <Command>
                 <CommandInput
                   placeholder="스택 검색..."
                   className="text-white"
                 />
-                <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
+                <CommandEmpty className="text-white">
+                  검색 결과가 없습니다.
+                </CommandEmpty>
                 <CommandGroup>
                   {ALL_STACKS.map((stack) => (
                     <CommandItem
                       key={stack.id}
                       value={stack.label}
                       onSelect={() => handleSelectStack(stack.id)}
-                      className="aria-selected:bg-gray-700"
-                    >
+                      className=" aria-selected:bg-brand-primary">
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
@@ -283,20 +282,18 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
               </Command>
             </PopoverContent>
           </Popover>
-          <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border border-gray-700 rounded-md">
+          <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border border-brand-surface rounded-md">
             {selectedStackIds.map((stackId) => {
               const stack = ALL_STACKS.find((s) => s.id === stackId);
               return (
                 <Badge
                   key={stackId}
                   variant="secondary"
-                  className="flex items-center gap-x-1 bg-lime-400 text-black"
-                >
+                  className="flex items-center gap-x-1 bg-brand-primary text-black">
                   <span>{stack?.label}</span>
                   <button
                     onClick={() => handleRemoveStack(stackId)}
-                    className="rounded-full hover:bg-black/20"
-                  >
+                    className="rounded-full hover:bg-black/20">
                     <X className="h-3 w-3" />
                   </button>
                 </Badge>
@@ -306,7 +303,7 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
         </div>
 
         <div className="space-y-3">
-          <Label>관심 분야</Label>
+          <Label>관심 분야 (최대 3개)</Label>
           <div className="grid grid-cols-4 gap-2">
             {INTEREST_TOPICS.map((topic) => (
               <Button
@@ -314,11 +311,10 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
                 variant="outline"
                 onClick={() => handleInterestToggle(topic.id)}
                 className={cn(
-                  "rounded-md border-gray-600 bg-transparent hover:bg-gray-800 hover:text-white",
+                  "rounded-md border-brand-surface bg-transparent hover:bg-brand-primary hover:text-white",
                   selectedInterestIds.includes(topic.id) &&
-                    "border-lime-400 text-lime-400 border-2"
-                )}
-              >
+                    "border-brand-primary text-brand-primary border-1"
+                )}>
                 {topic.name}
               </Button>
             ))}
@@ -329,8 +325,7 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
       <div className="pt-4">
         <Button
           onClick={handleSubmit}
-          className="w-full bg-lime-400 hover:bg-lime-500 text-black font-bold text-lg py-6"
-        >
+          className="w-full bg-brand-primary hover:bg-brand-primary/80 text-black font-bold text-lg py-6">
           다음
         </Button>
       </div>
