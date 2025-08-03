@@ -11,7 +11,7 @@ export function PostDetailPage() {
 
   if (!postId) {
     return (
-      <GlobalLayout variant="black">
+      <GlobalLayout>
         <div className="p-4 text-white">유효하지 않은 게시글 ID입니다.</div>
       </GlobalLayout>
     );
@@ -23,21 +23,21 @@ export function PostDetailPage() {
 
   if (isLoading) {
     return (
-      <GlobalLayout variant="black">
+      <GlobalLayout>
         <div className="p-4 text-white">로딩 중...</div>
       </GlobalLayout>
     );
   }
   if (isError) {
     return (
-      <GlobalLayout variant="black">
+      <GlobalLayout>
         <div className="p-4 text-white">에러 발생: {error.message}</div>
       </GlobalLayout>
     );
   }
   if (!post) {
     return (
-      <GlobalLayout variant="black">
+      <GlobalLayout>
         <div className="p-4 text-white">게시글이 없습니다.</div>
       </GlobalLayout>
     );
@@ -48,7 +48,7 @@ export function PostDetailPage() {
   const handleBookmarkClick = () => console.log("bookmark post");
 
   return (
-    <GlobalLayout variant="black">
+    <GlobalLayout>
       <div className="flex flex-col h-full">
         <PostHeader onBookmarkClick={handleBookmarkClick} />
         <div className="flex-grow overflow-y-auto px-4">
