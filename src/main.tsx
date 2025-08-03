@@ -1,22 +1,68 @@
-// src/main.tsx
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import "./index.css";
+import App from "./App.tsx";
+import { LoginPage } from "./pages/auth/LoginPage.tsx";
+import { BoardPage } from "./pages/home/index.tsx";
+import { MyPage } from "./pages/my/index.tsx";
+import { DeveloperPage } from "./pages/developer/index.tsx";
+import { ExplorePage } from "./pages/explore/index.tsx";
+import { OnboardingPage } from "./pages/onboarding/OnboardingPage.tsx";
+import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
 
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-import { BrowserRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+async function enableMocking() {
+  if (import.meta.env.DEV) {
+    const { worker } = await import("./mocks/browser.ts");
+    return worker.start();
+  }
+}
 
-// 1. QueryClient 인스턴스를 생성합니다.
-const queryClient = new QueryClient();
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        index: true,
+        element: <BoardPage />,
+      },
+      {
+        path: "board/:category",
+        element: <BoardPage />,
+      },
+      {
+        path: "explore",
+        element: <ExplorePage />,
+      },
+      {
+        path: "my",
+        element: <MyPage />,
+      },
+      {
+        path: "developer/:id",
+        element: <DeveloperPage />,
+      },
+      {
+        path: "community/:postId",
+        element: <PostDetailPage />,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/onboarding",
+    element: <OnboardingPage />,
+  },
+]);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    {/* 2. QueryClientProvider로 앱 전체를 감싸줍니다. */}
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </QueryClientProvider>
-  </React.StrictMode>,
-)
+enableMocking().then(() => {
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>
+  );
+});
