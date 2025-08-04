@@ -1,3 +1,4 @@
+import { Outlet } from "react-router-dom";
 import GlobalLayout from "./components/layout/GlobalLayout";
 import { OnboardingPage } from "./pages/onboarding/OnboardingPage";
 import { PostDetailPage } from "./pages/community/PostDetailPage";
@@ -29,12 +30,8 @@ function App() {
   );
 
   return (
-    <GlobalLayout>
-      <Routes>
-        <Route path="/onboarding" element={<OnboardingPage />} />
-        <Route path="/community/:postId" element={<PostDetailPage />} />
-        <Route path="*" element={mainPageContent} />
-      </Routes>
+    <GlobalLayout variant="black">
+      <Outlet />
     </GlobalLayout>
   );
 }
