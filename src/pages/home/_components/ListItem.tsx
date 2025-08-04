@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { Post } from "@/types/board";
 import { BOARD_CATEGORIES } from "@/constants/board";
 
@@ -9,12 +10,19 @@ interface ListItemProps {
 }
 
 export const ListItem = ({ post }: ListItemProps) => {
+  const navigate = useNavigate();
   const categoryLabel =
     BOARD_CATEGORIES.find((c) => c.value === post.categoryId.toString())
       ?.label || "";
 
+  const handleClick = () => {
+    navigate(`/community/${post.id}`);
+  };
+
   return (
-    <Card className="bg-brand-surface border-none text-white hover:bg-brand-surface/50 transition-colors">
+    <Card
+      className="bg-brand-surface border-none text-white hover:bg-brand-surface/50 transition-colors cursor-pointer"
+      onClick={handleClick}>
       <CardHeader>
         <Badge className="w-fit p-0 text-left bg-transparent border-none text-brand-primary">
           {categoryLabel}
