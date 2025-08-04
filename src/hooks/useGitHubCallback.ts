@@ -11,6 +11,8 @@ export const useGitHubCallback = () => {
     mutationFn: fetchLogin,
     retry: false,
     onSuccess: (result) => {
+      sessionStorage.removeItem('github_oauth_state');
+
       if (result.status === 200) {
         localStorage.setItem('access_token', result.token);
         navigate('/', { replace: true });
@@ -50,11 +52,10 @@ export const useGitHubCallback = () => {
       }
 
       signInMutation.mutate(code);
-      sessionStorage.removeItem('github_oauth_state');
     };
 
     handleCallback();
-  }, [searchParams, navigate, signInMutation]);
+  }, [searchParams, navigate]);
 
   return {
     isPending: signInMutation.isPending,

@@ -40,7 +40,7 @@ export const fetchStacks = async (): Promise<Stack[]> => {
 };
 
 export const fetchLogin = async (code: string): Promise<FetchLoginResponse> => {
-  const response = await fetch(`/api/auth/sign-in?code=${encodeURIComponent(code)}`, {
+  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-in?code=${encodeURIComponent(code)}`, {
     method: 'GET',
     headers: {
       'Accept': 'application/json'
