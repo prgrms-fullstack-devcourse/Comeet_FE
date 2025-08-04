@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { fetchLogin } from '@/lib/api';
@@ -6,6 +6,7 @@ import { fetchLogin } from '@/lib/api';
 export const useGitHubCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const hasProcessed = useRef(false);
 
   const signInMutation = useMutation({
     mutationFn: fetchLogin,
@@ -27,7 +28,11 @@ export const useGitHubCallback = () => {
   });
 
   useEffect(() => {
+    if (hasProcessed.current) return;
+
     const handleCallback = () => {
+      hasProcessed.current = true;
+
       const code = searchParams.get('code');
       const error = searchParams.get('error');
       const state = searchParams.get('state');
