@@ -25,6 +25,7 @@ const queryClient = new QueryClient({
 });
 import { OnboardingPage } from "./pages/onboarding/OnboardingPage.tsx";
 import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
+import { PrivateRoute } from "./components/auth/PrivateRoute.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -36,7 +37,11 @@ async function enableMocking() {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: (
+      <PrivateRoute>
+        <App />
+      </PrivateRoute>
+    ),
     children: [
       {
         index: true,
@@ -62,19 +67,19 @@ const router = createBrowserRouter([
         path: "community",
         element: <PostDetailPage />,
       },
-      {
-        path: "login",
-        element: <LoginPage />,
-      },
-      {
-        path: "onboarding",
-        element: <OnboardingPage />,
-      },
     ],
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
   },
   {
     path: "/callback",
     element: <AuthCallbackPage />,
+  },
+  {
+    path: "/onboarding",
+    element: <OnboardingPage />,
   },
 ]);
 
