@@ -8,16 +8,17 @@ import { Linkedin, Mail, Instagram, Rss } from "lucide-react";
 interface StepProps {
   onNext: (data: Partial<OnboardingData>) => void;
   data: Partial<OnboardingData>;
+  isPending: boolean;
 }
 
-export function OnboardingStep3({ onNext, data }: StepProps) {
-  const [linkedin, setLinkedin] = useState(data.linkedin || "");
+export function OnboardingStep3({ onNext, data, isPending }: StepProps) {
+  const [linkedIn, setLinkedIn] = useState(data.linkedIn || "");
   const [email, setEmail] = useState(data.email || "");
   const [instagram, setInstagram] = useState(data.instagram || "");
   const [blog, setBlog] = useState(data.blog || "");
 
   const handleSubmit = () => {
-    onNext({ linkedin, email, instagram, blog });
+    onNext({ linkedIn, email, instagram, blog });
   };
 
   return (
@@ -27,14 +28,14 @@ export function OnboardingStep3({ onNext, data }: StepProps) {
       </p>
 
       <div className="space-y-2">
-        <Label htmlFor="linkedin">링크드인</Label>
+        <Label htmlFor="linkedIn">링크드인</Label>
         <div className="relative">
           <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <Input
-            id="linkedin"
+            id="linkedIn"
             placeholder="https://linkedin.com/in/..."
-            value={linkedin}
-            onChange={(e) => setLinkedin(e.target.value)}
+            value={linkedIn}
+            onChange={(e) => setLinkedIn(e.target.value)}
             className="bg-gray-800 border-gray-600 focus:border-lime-400 pl-10"
           />
         </div>
@@ -86,9 +87,10 @@ export function OnboardingStep3({ onNext, data }: StepProps) {
       <div className="pt-4">
         <Button
           onClick={handleSubmit}
+          disabled={isPending}
           className="w-full bg-lime-400 hover:bg-lime-500 text-black font-bold text-lg py-6"
         >
-          다음
+          {isPending ? "저장 중..." : "다음"}
         </Button>
       </div>
     </div>

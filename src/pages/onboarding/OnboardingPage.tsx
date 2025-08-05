@@ -4,6 +4,7 @@ import { OnboardingStep2 } from "@/pages/onboarding/__components/OnboardingStep2
 import { OnboardingStep3 } from "@/pages/onboarding/__components/OnboardingStep3";
 import { OnboardingStep4 } from "@/pages/onboarding/__components/OnboardingStep4";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUpdateUserProfile } from "@/hooks/useOnboarding";
 
 export interface OnboardingData {
   nickname?: string;
@@ -13,7 +14,7 @@ export interface OnboardingData {
   position?: number;
   techStack?: number[];
   interests?: number[];
-  linkedin?: string;
+  linkedIn?: string;
   email?: string;
   instagram?: string;
   blog?: string;
@@ -24,16 +25,19 @@ export function OnboardingPage() {
   const [onboardingData, setOnboardingData] = useState<Partial<OnboardingData>>(
     {}
   );
+  const { mutate: updateUserProfile, isPending } = useUpdateUserProfile();
+
   const TOTAL_STEPS = 4;
 
   const handleNext = (currentStepData: Partial<OnboardingData>) => {
     const newData = { ...onboardingData, ...currentStepData };
     setOnboardingData(newData);
 
-    if (step < TOTAL_STEPS) {
+    if (step < TOTAL_STEPS - 1) {
       setStep((prev) => prev + 1);
     } else {
       console.log("최종 데이터:", newData);
+      updateUserProfile(newData as OnboardingData);
     }
   };
 
@@ -80,7 +84,11 @@ export function OnboardingPage() {
             <OnboardingStep2 onNext={handleNext} data={onboardingData} />
           )}
           {step === 3 && (
-            <OnboardingStep3 onNext={handleNext} data={onboardingData} />
+            <OnboardingStep3
+              onNext={handleNext}
+              data={onboardingData}
+              isPending={isPending}
+            />
           )}
           {step === 4 && <OnboardingStep4 />}
         </CardContent>

@@ -43,7 +43,7 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
       alert("나이를 입력해주세요.");
       return;
     }
-    if (Number(age) >= MAX_AGE_LIMIT) {
+    if (age >= MAX_AGE_LIMIT) {
       alert(`나이는 ${MAX_AGE_LIMIT} 미만으로 입력해주세요.`);
       return;
     }
@@ -58,7 +58,7 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
 
     const experienceValue = parseInt(experience, 10);
 
-    onNext({ nickname, age: Number(age), experience: experienceValue, bio });
+    onNext({ nickname, age: age, experience: experienceValue, bio });
   };
 
   return (
@@ -85,7 +85,8 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
             onChange={handleAgeChange}
             className={cn(
               "bg-gray-800 border-gray-600 focus:border-lime-400",
-              Number(age) >= MAX_AGE_LIMIT &&
+              age &&
+                age >= MAX_AGE_LIMIT &&
                 "border-red-500 focus:border-red-500 text-red-500"
             )}
           />
