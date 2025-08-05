@@ -4,6 +4,7 @@ import { OnboardingStep2 } from "@/pages/onboarding/__components/OnboardingStep2
 import { OnboardingStep3 } from "@/pages/onboarding/__components/OnboardingStep3";
 import { OnboardingStep4 } from "@/pages/onboarding/__components/OnboardingStep4";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import GlobalLayout from "@/components/layout/GlobalLayout";
 
 export interface OnboardingData {
   nickname?: string;
@@ -55,36 +56,38 @@ export function OnboardingPage() {
   };
 
   return (
-    <div className="w-full pt-8">
-      {step < TOTAL_STEPS && (
-        <div className="w-full bg-gray-700 rounded-full h-2 mb-4">
-          <div
-            className="bg-lime-400 h-2 rounded-full transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      )}
-      <Card className="bg-transparent border-none text-white">
+    <GlobalLayout showHeader={false} showBottomNavigation={false}>
+      <div className="w-full pt-8">
         {step < TOTAL_STEPS && (
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold">
-              {getStepTitle()}
-            </CardTitle>
-          </CardHeader>
+          <div className="w-full bg-gray-700 rounded-full h-2 mb-4">
+            <div
+              className="bg-lime-400 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         )}
-        <CardContent>
-          {step === 1 && (
-            <OnboardingStep1 onNext={handleNext} data={onboardingData} />
+        <Card className="bg-transparent border-none text-white">
+          {step < TOTAL_STEPS && (
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">
+                {getStepTitle()}
+              </CardTitle>
+            </CardHeader>
           )}
-          {step === 2 && (
-            <OnboardingStep2 onNext={handleNext} data={onboardingData} />
-          )}
-          {step === 3 && (
-            <OnboardingStep3 onNext={handleNext} data={onboardingData} />
-          )}
-          {step === 4 && <OnboardingStep4 />}
-        </CardContent>
-      </Card>
-    </div>
+          <CardContent>
+            {step === 1 && (
+              <OnboardingStep1 onNext={handleNext} data={onboardingData} />
+            )}
+            {step === 2 && (
+              <OnboardingStep2 onNext={handleNext} data={onboardingData} />
+            )}
+            {step === 3 && (
+              <OnboardingStep3 onNext={handleNext} data={onboardingData} />
+            )}
+            {step === 4 && <OnboardingStep4 />}
+          </CardContent>
+        </Card>
+      </div>
+    </GlobalLayout>
   );
 }
