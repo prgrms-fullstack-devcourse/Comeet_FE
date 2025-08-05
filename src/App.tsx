@@ -1,26 +1,38 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import GlobalLayout from "./components/layout/GlobalLayout";
-import { OnboardingPage } from "./pages/onboarding/OnboardingPage";
 
 function App() {
-  const path = window.location.pathname;
+  const location = useLocation();
 
-  let content;
-  if (path === '/onboarding') {
-    content = <OnboardingPage />;
-  } else {
-    content = (
-      <>
-        <p className="text-brand-primary">brand-primary 색상 테스트</p>
-        <p className="bg-brand-surface text-brand-text">brand 색상 테스트</p>
-        <hr className="my-8 border-gray-600" />
-        <a href="/onboarding" className="text-lg font-bold text-lime-400 hover:underline"> 온보딩 페이지 테스트 </a>
-      </>
+  const layoutGroups = {
+    full: ["/", "/board", "/explore", "/my"], // header + bottom nav
+    headerOnly: ["/developer", "/community", "/onboarding"], // only header
+    none: ["/login", "/search"], // no header and bottom nav
+  };
+
+  const currentPath = location.pathname;
+
+  // no header and bottom nav
+  if (layoutGroups.none.some((path) => currentPath.startsWith(path))) {
+    return (
+      <GlobalLayout showHeader={false} showBottomNavigation={false}>
+        <Outlet />
+      </GlobalLayout>
     );
   }
 
+  // only header
+  if (layoutGroups.headerOnly.some((path) => currentPath.startsWith(path))) {
+    return (
+      <GlobalLayout showBottomNavigation={false}>
+        <Outlet />
+      </GlobalLayout>
+    );
+  }
+
+  // basic(header + bommon nav)
   return (
-    <GlobalLayout variant="black">
+    <GlobalLayout>
       <Outlet />
     </GlobalLayout>
   );
