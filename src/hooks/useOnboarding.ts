@@ -11,9 +11,17 @@ const updateUserProfile = async (data: OnboardingData) => {
   if (!payload.instagram) delete payload.instagram;
   if (!payload.blog) delete payload.blog;
 
-  const res = await fetch('/api/users', {
+  const sessionId = sessionStorage.getItem("sessionId"); 
+  if (!sessionId) {
+    throw new Error('인증 정보가 없습니다. 다시 로그인해주세요.');
+  }
+
+  const res = await fetch(`/api/users`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      "Authorization": `Bearer ${sessionId}`, 
+    },
     body: JSON.stringify(payload),
   });
 

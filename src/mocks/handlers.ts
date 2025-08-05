@@ -4,6 +4,21 @@ import type { Post } from "@/types/board";
 import type { ExploreTabValue } from "@/constants/explore";
 import type { UICategory } from "@/constants/board";
 
+const mockDetailedPost = {
+  id: 1,
+  category: "자유게시판",
+  title: "상세 페이지 제목입니다",
+  author: { name: "작성자", avatarUrl: "" },
+  createdAt: "2025.08.05",
+  content: "이 내용은 실제 백엔드 서버가 아닌, MSW가 응답한 가짜 게시글 상세 내용입니다.",
+  likeCount: 100,
+  isLiked: false,
+  comments: [
+    { id: 101, author: { name: "댓글러1", avatarUrl: "" }, content: "MSW 댓글입니다!", createdAt: "2025.08.05", likeCount: 5 },
+    { id: 102, author: { name: "댓글러2", avatarUrl: "" }, content: "정말 유용한 정보네요.", createdAt: "2025.08.05", likeCount: 3 },
+  ]
+};
+
 const FAKE_DEVELOPERS: Developer[] = [
   {
     id: 1,
@@ -190,4 +205,40 @@ export const handlers = [
   http.get("/api/stacks", () => {
     return HttpResponse.json(ALL_STACKS);
   }),
-];
+
+// 온보딩 프로필 업데이트
+  http.patch('/api/users', async ({ request }) => {
+    const data = await request.json();
+    console.log('MSW: 온보딩 데이터 수신 완료!', data);
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  // 게시글 상세 정보
+  http.get('/api/posts/:postId', ({ params }) => {
+    console.log(`MSW: ${params.postId}번 게시글 상세 정보 요청`);
+    // id만 일치시키고 나머지 데이터는 mock 사용
+    return HttpResponse.json({ ...mockDetailedPost, id: Number(params.postId) });
+  }),
+
+  // 댓글 목록
+  http.get('/api/posts/:postId/comments', ({ params }) => {
+    console.log(`MSW: ${params.postId}번 게시글의 댓글 목록 요청`);
+    return HttpResponse.json(mockDetailedPost.comments);
+  }),
+
+  // 게시글 좋아요
+  http.put('/api/posts/:postId/like', ({ params }) => {
+    console.log(`MSW: ${params.postId}번 게시글 좋아요 요청`);
+    mockDetailedPost.isLiked = !mockDetailedPost.isLiked;
+    mockDetailedPost.likeCount += mockDetailedPost.isLiked ? 1 : -1;
+    return new HttpResponse(null, { status: 204 });
+  }),
+  
+  // 새 댓글 작성
+  http.post('/api/posts/:postId/comments', async ({ request, params }) => {
+    const newComment = await request.json();
+    console.log(`MSW: ${params.postId}번 게시글에 새 댓글 추가`, newComment);
+    return new HttpResponse(null, { status: 201 });
+  }),
+
+  ];
