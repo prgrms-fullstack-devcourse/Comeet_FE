@@ -15,7 +15,8 @@ export const useGitHubCallback = () => {
       sessionStorage.removeItem('github_oauth_state');
 
       if (result.status === 200) {
-        localStorage.setItem('access_token', result.token);
+        localStorage.setItem('access_token', result.accessToken);
+        localStorage.setItem('session_id', result.sessionId);
         navigate('/', { replace: true });
       } else if (result.status === 210) {
         sessionStorage.setItem('github_id', result.githubId);

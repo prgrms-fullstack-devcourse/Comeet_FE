@@ -56,12 +56,15 @@ export const fetchLogin = async (code: string): Promise<FetchLoginResponse> => {
   if (response.status === 200) {
     return {
       status: 200,
-      token: data.token
+      accessToken: data.accessToken,
+      sessionId: data.sessionId,
+      user: data.user
     };
   } else if (response.status === 210) {
     return {
       status: 210,
-      githubId: data.githubId
+      githubId: data.githubId,
+      user: data.user
     };
   } else {
     throw new Error(`예상하지 못한 응답 상태: ${response.status}`);
