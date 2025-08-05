@@ -10,7 +10,8 @@ import { MyPage } from "./pages/my/index.tsx";
 import { DeveloperPage } from "./pages/developer/index.tsx";
 import { ExplorePage } from "./pages/explore/index.tsx";
 import AuthCallbackPage from "./pages/auth/AuthCallbackPage.tsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { OnboardingPage } from "./pages/onboarding/OnboardingPage.tsx";
+import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,8 +25,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-import { OnboardingPage } from "./pages/onboarding/OnboardingPage.tsx";
-import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -33,8 +32,6 @@ async function enableMocking() {
     return worker.start();
   }
 }
-
-const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -62,7 +59,7 @@ const router = createBrowserRouter([
         element: <DeveloperPage />,
       },
       {
-        path: "community",
+        path: "community", // 이 경로는 /community가 아닌 /community/:id 일 수 있습니다. 확인이 필요합니다.
         element: <PostDetailPage />,
       },
       {
@@ -80,7 +77,7 @@ const router = createBrowserRouter([
     element: <AuthCallbackPage />,
   },
 ]);
-/*
+
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
@@ -90,8 +87,8 @@ enableMocking().then(() => {
     </StrictMode>
   );
 });
-*/
 
+/*
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
@@ -99,3 +96,4 @@ createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </StrictMode>
 );
+*/
