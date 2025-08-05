@@ -1,6 +1,24 @@
 import { Button } from "@/components/ui/button";
 
 export function LoginPage() {
+  const handleGitHubLogin = () => {
+    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+    const redirectUri = `${window.location.origin}/callback`;
+    const scope = "user:email";
+    const state = Math.random().toString(36).substring(7);
+
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      scope: scope,
+      state: state,
+    });
+    const githubAuthUrl = `https://github.com/login/oauth/authorize?${params.toString()}`;
+
+    sessionStorage.setItem("github_oauth_state", state);
+    window.location.href = githubAuthUrl;
+  };
+
   return (
     <div className="flex flex-col justify-between min-h-full p-8">
       <section className="mt-20">
@@ -16,16 +34,18 @@ export function LoginPage() {
 
       <section className="mb-4">
         <Button
+          onClick={handleGitHubLogin}
           className="
-              w-full
-              h-12
-              bg-brand-primary 
-              hover:bg-brand-primary/90 
-              text-brand-background 
-              text-lg
-              font-bold 
-              gap-5
-            ">
+          w-full
+          h-12
+          bg-brand-primary 
+          hover:bg-brand-primary/90 
+          text-brand-background 
+          text-lg
+          font-bold 
+          gap-5
+          cursor-pointer
+        ">
           <img
             src="/github-black.svg"
             alt="Github 로고"

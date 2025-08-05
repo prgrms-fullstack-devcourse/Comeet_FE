@@ -8,6 +8,21 @@ import { BoardPage } from "./pages/home/index.tsx";
 import { MyPage } from "./pages/my/index.tsx";
 import { DeveloperPage } from "./pages/developer/index.tsx";
 import { ExplorePage } from "./pages/explore/index.tsx";
+import AuthCallbackPage from "./pages/auth/AuthCallbackPage.tsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      retry: 3,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 2,
+    },
+  },
+});
 import { OnboardingPage } from "./pages/onboarding/OnboardingPage.tsx";
 import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
 
@@ -57,12 +72,18 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "/callback",
+    element: <AuthCallbackPage />,
+  },
 ]);
 
 enableMocking().then(() => {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </StrictMode>
   );
 });
