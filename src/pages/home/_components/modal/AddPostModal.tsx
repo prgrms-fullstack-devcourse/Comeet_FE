@@ -1,7 +1,4 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -12,6 +9,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { ModalWrapper } from "@/components/common/ModalWrapper";
 import { BOARD_CATEGORIES } from "@/constants/board";
+import { PostItem } from "./PostItem";
+import { RecruitItem } from "./RecruitItem";
+import { useAddPostModal } from "../../../../hooks/useAddPostModal";
 
 interface AddPostModalProps {
   onClose: () => void;
@@ -24,24 +24,23 @@ export const AddPostModal = ({
   onSubmit,
   isSubmitting = false,
 }: AddPostModalProps) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [selectedBoard, setSelectedBoard] = useState<string>("");
+  const {
+    title,
+    content,
+    selectedBoard,
+    description,
+    recruitCount,
+    position,
+    selectedStackIds,
+    isRecruitBoard,
+    setSelectedBoard,
+    reset,
+  } = useAddPostModal();
 
-  const handleSubmit = () => {
-    if (!title.trim() || !content.trim() || !selectedBoard) {
-      alert("모든 필드를 입력해주세요.");
-      return;
-    }
-
-    const boardId = parseInt(selectedBoard);
-    onSubmit({ title: title.trim(), content: content.trim(), boardId });
-  };
+  const handleSubmit = () => {};
 
   const handleClose = () => {
-    setTitle("");
-    setContent("");
-    setSelectedBoard("");
+    reset();
     onClose();
   };
 
@@ -56,9 +55,14 @@ export const AddPostModal = ({
       <Button
         onClick={handleSubmit}
         disabled={
-          isSubmitting || !title.trim() || !content.trim() || !selectedBoard
+          isSubmitting ||
+          !title.trim() ||
+          !selectedBoard ||
+          (isRecruitBoard
+            ? !description.trim() || !position || selectedStackIds.length === 0
+            : !content.trim())
         }
-        className="flex-1 bg-brand-primary hover:bg-brand-primary/90 font-bold text-base py-6">
+        className="flex-1 bg-brand-primary   hover:bg-brand-primary/90 font-bold text-base py-6">
         {isSubmitting ? "작성 중..." : "작성하기"}
       </Button>
     </div>
@@ -89,35 +93,8 @@ export const AddPostModal = ({
           </Select>
         </div>
 
-        {/* 제목 입력 */}
-        <div className="space-y-3">
-          <Label>제목</Label>
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="제목을 입력하세요"
-            className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary"
-            maxLength={100}
-          />
-          <div className="text-right text-sm text-brand-text">
-            {title.length}/100
-          </div>
-        </div>
-
-        {/* 내용 입력 */}
-        <div className="space-y-3">
-          <Label>내용</Label>
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="내용을 입력하세요"
-            className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary resize-none min-h-[200px]"
-            maxLength={2000}
-          />
-          <div className="text-right text-sm text-brand-text">
-            {content.length}/2000
-          </div>
-        </div>
+        {/*포스트, 리크루트 조건부 렌더링*/}
+        {isRecruitBoard ? <RecruitItem /> : <PostItem />}
       </div>
     </ModalWrapper>
   );
