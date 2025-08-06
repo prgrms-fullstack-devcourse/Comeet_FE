@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import type { Post } from "../../types/board";
 import { fetchPosts } from "../../lib/api";
 import { AppTabs } from "../../components/common/AppTabs";
+import { AddPostModal } from "./_components/AddPostModal";
 import { ListItem } from "./_components/ListItem";
 import { BOARD_CATEGORIES, BOARD_CATEGORY_VALUES } from "../../constants/board";
 import type { UICategory } from "../../constants/board";
@@ -16,6 +17,8 @@ export const BoardPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const isValidCategory = (cat: string): cat is UICategory => {
@@ -56,6 +59,31 @@ export const BoardPage = () => {
     navigate("/search");
   };
 
+  const handlePlusClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handlePostSubmit = async (data: {
+    title: string;
+    content: string;
+    boardId: number;
+  }) => {
+    setIsSubmitting(true);
+    try {
+      // TODO: API 연동
+      console.log("게시글 작성:", data);
+      setIsModalOpen(false);
+      // 게시글 작성 후 목록 새로고침
+      const fetchedPosts = await fetchPosts(category as UICategory);
+      setPosts(fetchedPosts);
+    } catch (err) {
+      console.error("게시글 작성 실패:", err);
+      alert("게시글 작성에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (isLoading)
     return <div className="p-4 text-white text-center">로딩 중...</div>;
   if (error)
@@ -89,10 +117,19 @@ export const BoardPage = () => {
         </div>
         <Button
           size="icon"
+          onClick={handlePlusClick}
           className="absolute bottom-20 right-4 rounded-full w-16 h-16 bg-brand-primary text-brand-background hover:bg-brand-primary/90">
           <Plus className="size-8" />
         </Button>
       </div>
+
+      {isModalOpen && (
+        <AddPostModal
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handlePostSubmit}
+          isSubmitting={isSubmitting}
+        />
+      )}
     </div>
   );
 };
