@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import type { Post } from "../../types/board";
 import { fetchPosts } from "../../lib/api";
 import { AppTabs } from "../../components/common/AppTabs";
-import { AddPostModal } from "./_components/AddPostModal";
+import { AddPostModal } from "./_components/modal/AddPostModal";
 import { ListItem } from "./_components/ListItem";
 import { BOARD_CATEGORIES, BOARD_CATEGORY_VALUES } from "../../constants/board";
 import type { UICategory } from "../../constants/board";
