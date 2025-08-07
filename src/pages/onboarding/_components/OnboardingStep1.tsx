@@ -33,7 +33,6 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
   );
   const [isValid, setIsValid] = useState(false);
 
-  // 유효성 검사
   useEffect(() => {
     const isValidForm =
       nickname.trim() !== "" &&
@@ -58,7 +57,6 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
   };
 
   const handleLocationChange = (newLocation: { lng: number; lat: number }) => {
-    console.log("📍 온보딩에서 위치 변경:", newLocation);
     setLocation(newLocation);
   };
 
@@ -141,7 +139,6 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
           />
         </div>
 
-        {/* 위치 정보 수집 섹션 */}
         <div className="space-y-3">
           <Label>위치 정보</Label>
           <LocationSelector
