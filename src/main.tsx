@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
     },
   },
 });
-import { OnboardingPage } from "./pages/onboarding/OnboardingPage.tsx";
+import { OnboardingPage } from "./pages/onboarding/index.tsx";
 import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
 import ChatPage from "./pages/chat/index.tsx";
 import SearchPage from "./pages/search/index.tsx";
