@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { fetchStacks } from "@/lib/api";
-import type { Stack } from "@/types/filter";
+import type { Stack } from "@/types/filter.types";
 
 interface StackSelectorProps {
   selectedStackIds: number[];

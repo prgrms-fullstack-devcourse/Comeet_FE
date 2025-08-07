@@ -1,9 +1,13 @@
 import { http, HttpResponse } from "msw";
-import type { Developer } from "@/types/developer";
-import type { Post } from "@/types/board";
+import type { Developer } from "@/types/developer.types";
+import type { Post } from "@/types/board.types";
 import type { ExploreTabValue } from "@/constants/explore";
 import type { UICategory } from "@/constants/board";
-import type { Post as CommunityPost, Comment, Reply } from "@/types/community";
+import type {
+  Post as CommunityPost,
+  Comment,
+  Reply,
+} from "@/types/community.types";
 
 const FAKE_DEVELOPERS: Developer[] = [
   {

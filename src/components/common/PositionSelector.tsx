@@ -9,7 +9,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { fetchPositions } from "@/lib/api";
-import type { PositionCategory } from "@/types/filter";
+import type { PositionCategory } from "@/types/filter.types";
 
 interface PositionSelectorProps {
   selectedPosition: number | null;

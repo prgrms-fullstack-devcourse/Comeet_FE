@@ -13,17 +13,9 @@ export interface User {
   blog?: string;
 }
 
-export interface ExistingUserResponse {
-  status: 200;
+export interface LoginResponse {
   accessToken: string;
   sessionId: string;
-  user: User;
 }
 
-export interface NewUserResponse {
-  status: 210;
-  githubId: string;
-  user: User;
-}
-
-export type FetchLoginResponse = ExistingUserResponse | NewUserResponse;
+export type FetchLoginResponse = LoginResponse;

@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { Post } from "@/types/board";
+import type { Post } from "@/types/board.types";
 import { BOARD_CATEGORIES } from "@/constants/board";
 
 interface ListItemProps {

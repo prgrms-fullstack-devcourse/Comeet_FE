@@ -1,4 +1,4 @@
-import type { Developer } from "@/types/developer";
+import type { Developer } from "@/types/developer.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 

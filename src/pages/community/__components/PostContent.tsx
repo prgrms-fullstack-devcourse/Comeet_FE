@@ -1,4 +1,4 @@
-import type { Post } from "@/types/community";
+import type { Post } from "@/types/community.types";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
