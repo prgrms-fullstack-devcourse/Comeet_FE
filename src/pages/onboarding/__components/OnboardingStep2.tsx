@@ -1,10 +1,11 @@
-import { useState } from "react";
-import type { OnboardingData } from "@/pages/onboarding/OnboardingPage";
+import { useState, useEffect } from "react";
+import type { OnboardingData } from "@/pages/onboarding/index.tsx";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { PositionSelector } from "@/components/common/PositionSelector";
 import { StackSelector } from "@/components/common/StackSelector";
+
 const INTEREST_TOPICS = [
   { id: 1, name: "업계 동향" },
   { id: 2, name: "직무 정보" },
@@ -29,6 +30,17 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
   const [selectedInterestIds, setSelectedInterestIds] = useState<number[]>(
     data.interests || []
   );
+  const [isValid, setIsValid] = useState(false);
+
+  // 유효성 검사
+  useEffect(() => {
+    const isValidForm =
+      position !== undefined &&
+      selectedStackIds.length > 0 &&
+      selectedInterestIds.length > 0;
+
+    setIsValid(isValidForm);
+  }, [position, selectedStackIds, selectedInterestIds]);
 
   const handleInterestToggle = (topicId: number) => {
     const newInterestIds = selectedInterestIds.includes(topicId)
@@ -40,16 +52,13 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
   };
 
   const handleSubmit = () => {
-    if (!position) {
-      alert("포지션을 선택해주세요.");
+    if (!isValid) {
+      alert("포지션, 기술 스택, 관심 분야를 모두 선택해주세요.");
       return;
     }
-    if (selectedInterestIds.length === 0) {
-      alert("관심 분야를 1개 이상 선택해주세요.");
-      return;
-    }
+
     onNext({
-      position: position,
+      position: position!,
       techStack: selectedStackIds,
       interests: selectedInterestIds,
     });
@@ -87,13 +96,24 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
               </Button>
             ))}
           </div>
+          {selectedInterestIds.length === 0 && (
+            <p className="text-red-500 text-sm">
+              관심 분야를 1개 이상 선택해주세요.
+            </p>
+          )}
         </div>
       </div>
 
       <div className="pt-4">
         <Button
           onClick={handleSubmit}
-          className="w-full bg-brand-primary hover:bg-brand-primary/80 text-black font-bold text-lg py-6">
+          disabled={!isValid}
+          className={cn(
+            "w-full font-bold text-lg py-6",
+            isValid
+              ? "bg-brand-primary hover:bg-brand-primary/80 text-black"
+              : "bg-gray-400 text-gray-600 cursor-not-allowed"
+          )}>
           다음
         </Button>
       </div>
