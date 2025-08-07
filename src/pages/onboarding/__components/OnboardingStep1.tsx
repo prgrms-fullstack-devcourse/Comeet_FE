@@ -87,44 +87,48 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
       return toast.error("모든 항목을 입력해주세요.");
     if (!location) return toast.error("위치 정보를 불러와주세요.");
 
-    const experienceValue = parseInt(experience, 10);
+    const experienceValue = parseInt(experience.replace(/[^0-9]/g, ""), 10);
     onNext({ nickname, age, experience: experienceValue, bio, location });
   };
 
   return (
     <div className="flex flex-col min-h-[75vh]">
       <div className="flex-grow space-y-6">
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label htmlFor="nickname">닉네임</Label>
           <Input
             id="nickname"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
-            className="bg-gray-800 border-gray-600 focus:border-lime-400"
+            className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary"
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label htmlFor="age">나이</Label>
           <Input
             id="age"
             type="number"
             value={age}
             onChange={handleAgeChange}
-            className={cn("bg-gray-800 border-gray-600 focus:border-lime-400")}
+            className={cn(
+              "bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary",
+              Number(age) >= MAX_AGE_LIMIT &&
+                "border-red-500 focus:border-red-500 text-red-500"
+            )}
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label htmlFor="experience">경력</Label>
           <Select value={experience} onValueChange={setExperience}>
-            <SelectTrigger className="w-full bg-gray-800 border-gray-600 focus:ring-lime-400">
+            <SelectTrigger className="w-full bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary">
               <SelectValue placeholder="경력을 선택하세요" />
             </SelectTrigger>
-            <SelectContent className="bg-gray-900 border-gray-700 text-white">
+            <SelectContent className="bg-brand-surface border-transparent text-white">
               {Array.from({ length: 20 }, (_, i) => i + 1).map((year) => (
                 <SelectItem
                   key={year}
                   value={`${year}년차`}
-                  className="focus:bg-gray-700"
+                  className="focus:bg-brand-primary"
                 >
                   {year}년차
                 </SelectItem>
@@ -132,13 +136,13 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label htmlFor="bio">소개</Label>
           <Textarea
             id="bio"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="bg-gray-800 border-gray-600 focus:border-lime-400 min-h-[120px]"
+            className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary h-[120px] resize-none"
           />
         </div>
 

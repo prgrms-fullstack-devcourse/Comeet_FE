@@ -45,7 +45,7 @@ export const ExplorePage = () => {
   if (error) return <div>에러 발생: {error.message}</div>;
 
   return (
-    <div>
+    <div className="p-4">
       <AppTabs
         tabs={EXPLORE_TABS}
         value={activeTab}
