@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { OnboardingData } from "@/pages/onboarding/OnboardingPage";
+import type { OnboardingData } from "@/pages/onboarding/index.tsx";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,12 @@ export function OnboardingStep3({ onNext, data }: StepProps) {
   const [blog, setBlog] = useState(data.blog || "");
 
   const handleSubmit = () => {
-    onNext({ linkedin, email, instagram, blog });
+    onNext({
+      linkedin: linkedin.trim(),
+      email: email.trim(),
+      instagram: instagram.trim(),
+      blog: blog.trim(),
+    });
   };
 
   return (
@@ -87,7 +92,7 @@ export function OnboardingStep3({ onNext, data }: StepProps) {
         <Button
           onClick={handleSubmit}
           className="w-full bg-brand-primary hover:bg-brand-primary/80 text-black font-bold text-lg py-6">
-          다음
+          완료
         </Button>
       </div>
     </div>
