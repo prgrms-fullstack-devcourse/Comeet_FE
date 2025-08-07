@@ -23,6 +23,7 @@ export interface ExistingUserResponse {
 export interface NewUserResponse {
   status: 210;
   githubId: string;
+  sessionId: string;
   user: User;
 }
 

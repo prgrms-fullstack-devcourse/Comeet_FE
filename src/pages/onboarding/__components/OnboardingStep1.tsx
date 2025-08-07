@@ -1,5 +1,8 @@
 import { useState } from "react";
-import type { OnboardingData } from "@/pages/onboarding/OnboardingPage";
+import type {
+  OnboardingData,
+  Coordinates,
+} from "@/pages/onboarding/OnboardingPage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 const MAX_AGE_LIMIT = 120;
 
@@ -28,37 +32,63 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
   );
   const [bio, setBio] = useState(data.bio || "");
 
+  const [location, setLocation] = useState<Coordinates | null>(
+    data.location || null
+  );
+  const [isLocationLoading, setLocationLoading] = useState(false);
+
   const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "") {
-      setAge("");
-    } else {
-      const numValue = parseInt(value.replace(/[^0-9]/g, ""), 10);
-      setAge(numValue);
+    if (value === "") setAge("");
+    else setAge(parseInt(value.replace(/[^0-9]/g, ""), 10));
+  };
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("사용하시는 기기가 위치 정보 기능을 지원하지 않습니다.");
+      return;
     }
+
+    setLocationLoading(true);
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation({ lat: latitude, lng: longitude });
+        setLocationLoading(false);
+        toast.success("위치 정보 수집 완료!");
+      },
+      (error) => {
+        setLocationLoading(false);
+        if (error.code === error.PERMISSION_DENIED) {
+          toast.error("위치 정보 제공을 거부하셨습니다.");
+        } else if (error.code === error.TIMEOUT) {
+          toast.error("위치 정보를 가져오는 데 시간이 너무 오래 걸립니다.");
+        } else {
+          toast.error("위치 정보를 가져올 수 없습니다.");
+        }
+      },
+      options
+    );
   };
 
   const handleSubmit = () => {
-    if (age === "") {
-      alert("나이를 입력해주세요.");
-      return;
-    }
-    if (age >= MAX_AGE_LIMIT) {
-      alert(`나이는 ${MAX_AGE_LIMIT} 미만으로 입력해주세요.`);
-      return;
-    }
-    if (age < 1) {
-      alert("나이를 올바르게 입력해주세요.");
-      return;
-    }
-    if (!nickname || !age || !experience || !bio) {
-      alert("모든 항목을 입력해주세요.");
-      return;
-    }
+    if (age === "") return toast.error("나이를 입력해주세요.");
+    if (age >= MAX_AGE_LIMIT)
+      return toast.error(`나이는 ${MAX_AGE_LIMIT}세 미만으로 입력해주세요.`);
+    if (age < 1) return toast.error("나이를 올바르게 입력해주세요.");
+    if (!nickname || !experience || !bio)
+      return toast.error("모든 항목을 입력해주세요.");
+    if (!location) return toast.error("위치 정보를 불러와주세요.");
 
     const experienceValue = parseInt(experience, 10);
-
-    onNext({ nickname, age: age, experience: experienceValue, bio });
+    onNext({ nickname, age, experience: experienceValue, bio, location });
   };
 
   return (
@@ -68,7 +98,6 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
           <Label htmlFor="nickname">닉네임</Label>
           <Input
             id="nickname"
-            placeholder="사용하실 닉네임을 입력하세요"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             className="bg-gray-800 border-gray-600 focus:border-lime-400"
@@ -79,16 +108,9 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
           <Input
             id="age"
             type="number"
-            min="1"
-            placeholder="나이를 입력하세요"
             value={age}
             onChange={handleAgeChange}
-            className={cn(
-              "bg-gray-800 border-gray-600 focus:border-lime-400",
-              age &&
-                age >= MAX_AGE_LIMIT &&
-                "border-red-500 focus:border-red-500 text-red-500"
-            )}
+            className={cn("bg-gray-800 border-gray-600 focus:border-lime-400")}
           />
         </div>
         <div className="space-y-2">
@@ -114,11 +136,30 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
           <Label htmlFor="bio">소개</Label>
           <Textarea
             id="bio"
-            placeholder="자신을 자유롭게 소개해주세요."
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             className="bg-gray-800 border-gray-600 focus:border-lime-400 min-h-[120px]"
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label>위치 정보</Label>
+          <div className="flex items-center gap-x-2">
+            <div className="flex-grow p-2 h-10 border rounded-md border-gray-600 bg-gray-800 text-sm flex items-center">
+              {isLocationLoading
+                ? "위치 정보 불러오는 중..."
+                : location
+                ? "위치 정보 수집 완료!"
+                : "버튼을 눌러 위치 정보를 불러오세요."}
+            </div>
+            <Button
+              onClick={handleGetLocation}
+              disabled={isLocationLoading}
+              className="bg-lime-400 hover:bg-lime-500 text-black disabled:bg-gray-500 disabled:text-gray-300"
+            >
+              내 위치 불러오기
+            </Button>
+          </div>
         </div>
       </div>
       <div className="pt-4">

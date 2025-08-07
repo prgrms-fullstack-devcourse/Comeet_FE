@@ -1,67 +1,52 @@
-import { useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { fetchLogin } from '@/lib/api';
+import { useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { fetchLogin } from "@/lib/api";
+import type { FetchLoginResponse } from "@/types/auth";
 
 export const useGitHubCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const hasProcessed = useRef(false);
+  const hasFetched = useRef(false);
 
-  const signInMutation = useMutation({
+  const signInMutation = useMutation<FetchLoginResponse, Error, string>({
     mutationFn: fetchLogin,
     retry: false,
     onSuccess: (result) => {
-      sessionStorage.removeItem('github_oauth_state');
+      sessionStorage.removeItem("github_oauth_state");
 
-      if (result.status === 200) {
-        sessionStorage.setItem('access_token', result.accessToken);
-        sessionStorage.setItem('session_id', result.sessionId);
-        navigate('/', { replace: true });
-      } else if (result.status === 210) {
-        sessionStorage.setItem('github_id', result.githubId);
-        navigate('/onboarding', { replace: true });
+      if (result.status === 200 && result.accessToken) {
+        sessionStorage.setItem("sessionId", result.accessToken);
+        navigate("/", { replace: true });
+      } else if (result.status === 210 && result.sessionId) {
+        sessionStorage.setItem("signUpSessionId", result.sessionId);
+        navigate("/onboarding", { replace: true });
+      } else {
+        navigate("/login", { replace: true });
       }
     },
-    onError: (error) => {
-      console.error('OAuth callback error:', error);
-    }
+    onError: () => {
+      navigate("/login", { replace: true });
+    },
   });
 
   useEffect(() => {
-    if (hasProcessed.current) return;
+    const code = searchParams.get("code");
+    const state = searchParams.get("state");
 
-    const handleCallback = () => {
-      hasProcessed.current = true;
+    if (!code || !state || hasFetched.current) {
+      return;
+    }
 
-      const code = searchParams.get('code');
-      const error = searchParams.get('error');
-      const state = searchParams.get('state');
+    const storedState = sessionStorage.getItem("github_oauth_state");
+    if (state !== storedState) {
+      navigate("/login", { replace: true });
+      return;
+    }
 
-      if (error) {
-        navigate('/login', { replace: true });
-        console.error('GitHub OAuth 에러:', error);
-        return;
-      }
-
-      if (!code) {
-        navigate('/login', { replace: true });
-        console.log('GitHub에서 인증 코드를 받지 못했습니다');
-        return;
-      }
-
-      const storedState = sessionStorage.getItem('github_oauth_state');
-      if (state !== storedState) {
-        navigate('/login', { replace: true });
-        console.log('보안 검증 실패');
-        return;
-      }
-
-      signInMutation.mutate(code);
-    };
-
-    handleCallback();
-  }, [searchParams, navigate, signInMutation]);
+    hasFetched.current = true;
+    signInMutation.mutate(code);
+  }, [searchParams, navigate, signInMutation.mutate]);
 
   return {
     isPending: signInMutation.isPending,

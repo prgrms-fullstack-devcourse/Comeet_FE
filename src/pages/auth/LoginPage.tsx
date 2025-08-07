@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 export function LoginPage() {
   const handleGitHubLogin = () => {
     const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
-    const redirectUri = "http://localhost:3000/api/auth/github/callback";
+    const redirectUri = "http://localhost:5173/callback";
     const scope = "user:email";
     const state = Math.random().toString(36).substring(7);
 

@@ -6,6 +6,11 @@ import { OnboardingStep4 } from "@/pages/onboarding/__components/OnboardingStep4
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUpdateUserProfile } from "@/hooks/useOnboarding";
 
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
 export interface OnboardingData {
   nickname?: string;
   age?: number;
@@ -18,6 +23,7 @@ export interface OnboardingData {
   email?: string;
   instagram?: string;
   blog?: string;
+  location?: Coordinates;
 }
 
 export function OnboardingPage() {
@@ -44,7 +50,7 @@ export function OnboardingPage() {
         onSuccess: () => {
           setStep(TOTAL_STEPS);
         },
-        onError: (err: any) => {
+        onError: () => {
           setErrorMsg("프로필 저장에 실패했습니다. 다시 시도해주세요.");
         },
       });

@@ -40,12 +40,15 @@ export const fetchStacks = async (): Promise<Stack[]> => {
 };
 
 export const fetchLogin = async (code: string): Promise<FetchLoginResponse> => {
-  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/sign-in?code=${encodeURIComponent(code)}`, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json'
-    },
-  });
+  const response = await fetch(
+    `/api/auth/sign-in?code=${encodeURIComponent(code)}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
 
   if (!response.ok) {
     throw new Error(`GitHub 로그인 실패: ${response.status}`);
@@ -53,20 +56,27 @@ export const fetchLogin = async (code: string): Promise<FetchLoginResponse> => {
 
   const data = await response.json();
 
-  if (response.status === 200) {
+  // [수정] 백엔드의 새로운 응답 형식에 맞춰 데이터를 해석합니다.
+  // 경우 1: 기존 유저 (응답에 'result' 객체와 그 안의 'accessToken'이 있음)
+  if (data.result && data.result.accessToken) {
     return {
       status: 200,
-      accessToken: data.accessToken,
-      sessionId: data.sessionId,
-      user: data.user
+      accessToken: data.result.accessToken,
+      sessionId: data.result.sessionId,
+      user: data.result.user,
     };
-  } else if (response.status === 210) {
+  }
+  // 경우 2: 신규 유저 (응답 최상위에 'sessionId'가 있음)
+  else if (data.sessionId) {
     return {
       status: 210,
       githubId: data.githubId,
-      user: data.user
+      sessionId: data.sessionId,
+      user: data.user,
     };
-  } else {
-    throw new Error(`예상하지 못한 응답 상태: ${response.status}`);
+  }
+  // 경우 3: 예상치 못한 응답
+  else {
+    throw new Error(`예상하지 못한 응답 데이터: ${JSON.stringify(data)}`);
   }
 };

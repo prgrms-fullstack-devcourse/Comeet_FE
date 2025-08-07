@@ -1,11 +1,15 @@
 import { useMutation } from "@tanstack/react-query";
-import type { OnboardingData } from "@/pages/onboarding/OnboardingPage";
+import type {
+  OnboardingData,
+  Coordinates,
+} from "@/pages/onboarding/OnboardingPage";
 
-interface UpdateUserPayload {
+interface SignUpPayload {
   nickname?: string;
   age?: number;
   experience?: number;
   bio?: string;
+  location?: Coordinates;
   positionId?: number;
   techIds?: number[];
   interestIds?: number[];
@@ -15,15 +19,18 @@ interface UpdateUserPayload {
   blog?: string;
 }
 
-const TEST_JWT =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZ2l0aHViSWQiOiIxMzA2NzUxMzQiLCJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTAwMDAwMDAwMDAwMDAwMDB9.uwQg26GHjxwskdZGI39zPx1zfIUhZZMokqOXlEnTsqc";
+const signUpUserProfile = async (data: OnboardingData) => {
+  const sessionId = sessionStorage.getItem("signUpSessionId");
+  if (!sessionId) {
+    throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+  }
 
-const updateUserProfile = async (data: OnboardingData) => {
-  const payload: UpdateUserPayload = {
+  const payload: SignUpPayload = {
     nickname: data.nickname,
     age: data.age,
     experience: data.experience,
     bio: data.bio,
+    location: data.location,
     positionId: data.position,
     techIds: data.techStack,
     interestIds: data.interests,
@@ -34,18 +41,18 @@ const updateUserProfile = async (data: OnboardingData) => {
   };
 
   Object.keys(payload).forEach((key) => {
-    const typedKey = key as keyof UpdateUserPayload;
+    const value = payload[key as keyof SignUpPayload];
     if (
-      payload[typedKey] === undefined ||
-      payload[typedKey] === null ||
-      payload[typedKey] === ""
+      value === undefined ||
+      value === null ||
+      (typeof value === "string" && value === "")
     ) {
-      delete payload[typedKey];
+      delete payload[key as keyof SignUpPayload];
     }
   });
 
-  const res = await fetch(`/api/users`, {
-    method: "PATCH",
+  const res = await fetch(`/api/auth/sign-up?sessionId=${sessionId}`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
@@ -53,14 +60,12 @@ const updateUserProfile = async (data: OnboardingData) => {
   });
 
   if (!res.ok) {
-    let errorMsg = "프로필 업데이트에 실패했습니다.";
+    let errorMsg = "프로필 등록에 실패했습니다.";
     try {
       const errorData = await res.json();
-      if (Array.isArray(errorData.message)) {
-        errorMsg = errorData.message[0];
-      } else if (typeof errorData.message === "string") {
-        errorMsg = errorData.message;
-      }
+      errorMsg = Array.isArray(errorData.message)
+        ? errorData.message[0]
+        : errorData.message;
     } catch {}
     throw new Error(errorMsg);
   }
@@ -68,13 +73,16 @@ const updateUserProfile = async (data: OnboardingData) => {
   if (res.status === 204 || res.status === 205) {
     return;
   }
+
   return res.json();
 };
 
 export function useUpdateUserProfile() {
-  return useMutation<void, Error, OnboardingData>({
-    mutationFn: updateUserProfile,
-    onSuccess: () => {},
+  return useMutation<any, Error, OnboardingData>({
+    mutationFn: signUpUserProfile,
+    onSuccess: () => {
+      sessionStorage.removeItem("signUpSessionId");
+    },
     onError: (error) => {
       throw error;
     },

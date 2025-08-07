@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://api-comeet.p-e.kr/",
+        target: "http://localhost:3000",
         changeOrigin: true,
       },
     },
