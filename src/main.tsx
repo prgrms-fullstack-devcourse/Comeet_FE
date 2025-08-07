@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./index.css";
 import App from "./App.tsx";
 import { LoginPage } from "./pages/auth/LoginPage.tsx";
@@ -8,8 +9,11 @@ import { BoardPage } from "./pages/home/index.tsx";
 import { MyPage } from "./pages/my/index.tsx";
 import { DeveloperPage } from "./pages/developer/index.tsx";
 import { ExplorePage } from "./pages/explore/index.tsx";
+import { OnboardingPage } from "./pages/onboarding/index.tsx";
+import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
 import AuthCallbackPage from "./pages/auth/AuthCallbackPage.tsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ChatPage from "./pages/chat/index.tsx";
+import SearchPage from "./pages/search/index.tsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,17 +27,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-import { OnboardingPage } from "./pages/onboarding/index.tsx";
-import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
-import ChatPage from "./pages/chat/index.tsx";
-import SearchPage from "./pages/search/index.tsx";
-
-async function enableMocking() {
-  if (import.meta.env.DEV) {
-    const { worker } = await import("./mocks/browser.ts");
-    return worker.start();
-  }
-}
 
 const router = createBrowserRouter([
   {
@@ -92,12 +85,10 @@ const router = createBrowserRouter([
   },
 ]);
 
-enableMocking().then(() => {
-  createRoot(document.getElementById("root")!).render(
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </StrictMode>
-  );
-});
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  </StrictMode>
+);
