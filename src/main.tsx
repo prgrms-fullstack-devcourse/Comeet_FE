@@ -25,6 +25,8 @@ const queryClient = new QueryClient({
 });
 import { OnboardingPage } from "./pages/onboarding/OnboardingPage.tsx";
 import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
+import ChatPage from "./pages/chat/index.tsx";
+import SearchPage from "./pages/search/index.tsx";
 
 async function enableMocking() {
   if (import.meta.env.DEV) {
@@ -43,12 +45,20 @@ const router = createBrowserRouter([
         element: <BoardPage />,
       },
       {
+        path: "board",
+        element: <BoardPage />,
+      },
+      {
         path: "board/:category",
         element: <BoardPage />,
       },
       {
         path: "explore",
         element: <ExplorePage />,
+      },
+      {
+        path: "chat",
+        element: <ChatPage />,
       },
       {
         path: "my",
@@ -59,7 +69,7 @@ const router = createBrowserRouter([
         element: <DeveloperPage />,
       },
       {
-        path: "community",
+        path: "community/:postId",
         element: <PostDetailPage />,
       },
       {
@@ -69,6 +79,10 @@ const router = createBrowserRouter([
       {
         path: "onboarding",
         element: <OnboardingPage />,
+      },
+      {
+        path: "search",
+        element: <SearchPage />,
       },
     ],
   },

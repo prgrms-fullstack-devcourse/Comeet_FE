@@ -30,7 +30,7 @@ export function OnboardingStep4() {
   }, []);
 
   const handleSubmit = () => {
-    navigate("/"); 
+    navigate("/board");
   };
 
   return (
@@ -39,8 +39,7 @@ export function OnboardingStep4() {
         className={cn(
           "text-4xl font-bold text-white transition-opacity duration-1000 ease-in-out",
           showText1 ? "opacity-100" : "opacity-0"
-        )}
-      >
+        )}>
         환영합니다!
       </h1>
 
@@ -48,21 +47,18 @@ export function OnboardingStep4() {
         className={cn(
           "text-lg text-gray-300 transition-opacity duration-1000 ease-in-out",
           showText2 ? "opacity-100" : "opacity-0"
-        )}
-      >
-        CO-MEET와 함께 즐거운 개발 생활 되세요!
+        )}>
+        CO-MEET과 함께 즐거운 개발 생활 되세요!
       </p>
 
       <div
         className={cn(
           "w-full pt-8 transition-opacity duration-1000 ease-in-out",
           showButton ? "opacity-100" : "opacity-0"
-        )}
-      >
+        )}>
         <Button
           onClick={handleSubmit}
-          className="w-full bg-lime-400 hover:bg-lime-500 text-black font-bold text-lg py-6"
-        >
+          className="w-full bg-brand-primary hover:bg-brand-primary/80 text-black font-bold text-lg py-6">
           홈으로
         </Button>
       </div>

@@ -1,31 +1,28 @@
 import type { ReactNode } from "react";
-import Header from "./Header";
 import BottomNavigation from "./BottomNavigation";
+import { useLocation } from "react-router-dom";
 
 interface GlobalLayoutProps {
   children: ReactNode;
-  showHeader?: boolean;
-  showBottomNavigation?: boolean;
-  headerTitle?: string;
 }
 
-function GlobalLayout({
-  children,
-  showHeader = true,
-  showBottomNavigation = true,
-  headerTitle
-}: GlobalLayoutProps) {
+function GlobalLayout({ children }: GlobalLayoutProps) {
+  const location = useLocation();
+
+  const shouldShowBottomNav = ["/board", "/explore", "/chat", "/my"].some(
+    (path) => location.pathname.startsWith(path)
+  );
+
   return (
     <div className="min-h-screen bg-slate-100 flex justify-center">
-      <div className={`w-[480px] bg-brand-background flex flex-col`}>
-        {showHeader && <Header title={headerTitle} />}
-        <main className="flex-1 p-4">
+      <div className={`w-[480px] bg-brand-background flex flex-col h-screen`}>
+        <main className="flex-1 overflow-y-auto scrollbar-hide">
           {children}
         </main>
-        {showBottomNavigation && <BottomNavigation />}
+        {shouldShowBottomNav && <BottomNavigation />}
       </div>
-    </div >
+    </div>
   );
-};
+}
 
 export default GlobalLayout;

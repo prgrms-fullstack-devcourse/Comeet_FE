@@ -1,4 +1,10 @@
-import { Home, MapPin, MessageCircle, User, type LucideIcon } from 'lucide-react';
+import {
+  Home,
+  MapPin,
+  MessageCircle,
+  User,
+  type LucideIcon,
+} from "lucide-react";
 
 interface NavItem {
   id: string;
@@ -8,23 +14,23 @@ interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   {
-    id: 'home',
+    id: "home",
     icon: Home,
-    path: '/'
+    path: "/board",
   },
   {
-    id: 'nearby',
+    id: "nearby",
     icon: MapPin,
-    path: '/nearby'
+    path: "/explore",
   },
   {
-    id: 'chat',
+    id: "chat",
     icon: MessageCircle,
-    path: '/chat'
+    path: "/chat",
   },
   {
-    id: 'profile',
+    id: "profile",
     icon: User,
-    path: '/profile'
-  }
+    path: "/my",
+  },
 ];

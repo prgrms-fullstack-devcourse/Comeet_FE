@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 interface RecentSearchListProps {
   searches: string[];
@@ -10,7 +10,7 @@ interface RecentSearchListProps {
 export default function RecentSearchList({
   searches,
   onSearchClick,
-  onRemove
+  onRemove,
 }: RecentSearchListProps) {
   if (searches.length === 0) {
     return (
@@ -21,27 +21,25 @@ export default function RecentSearchList({
   }
 
   return (
-    <>
+    <div className="p-4 space-y-2">
       {searches.map((search, index) => (
         <div key={search} className="flex items-center justify-between">
           <button
             onClick={() => onSearchClick(search)}
             className="text-white hover:text-brand-primary cursor-pointer"
-            aria-label={`"${search}" 검색하기`}
-          >
+            aria-label={`"${search}" 검색하기`}>
             {search}
           </button>
 
           <Button
             variant="ghost"
             onClick={() => onRemove(index)}
-            className="text-white hover:text-brand-primary hover:bg-brand-surface cursor-pointer"
-            aria-label="최근 검색 삭제"
-          >
+            className="text-white hover:text-brand-primary hover:bg-brand-surface cursor-pointer !p-0"
+            aria-label="최근 검색 삭제">
             <X />
           </Button>
         </div>
       ))}
-    </>
+    </div>
   );
 }

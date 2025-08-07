@@ -22,63 +22,63 @@ export function OnboardingStep3({ onNext, data }: StepProps) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-gray-400">
+      <p className="text-sm text-brand-text">
         다른 사람들에게 자신을 보여줄 수 있는 링크를 추가해보세요. (선택사항)
       </p>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <Label htmlFor="linkedin">링크드인</Label>
         <div className="relative">
-          <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-text" />
           <Input
             id="linkedin"
             placeholder="https://linkedin.com/in/..."
             value={linkedin}
             onChange={(e) => setLinkedin(e.target.value)}
-            className="bg-gray-800 border-gray-600 focus:border-lime-400 pl-10"
+            className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary pl-10"
           />
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <Label htmlFor="email">이메일</Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-text" />
           <Input
             id="email"
             type="email"
             placeholder="contact@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-gray-800 border-gray-600 focus:border-lime-400 pl-10"
+            className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary pl-10"
           />
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <Label htmlFor="instagram">인스타그램</Label>
         <div className="relative">
-          <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-text" />
           <Input
             id="instagram"
             placeholder="https://instagram.com/..."
             value={instagram}
             onChange={(e) => setInstagram(e.target.value)}
-            className="bg-gray-800 border-gray-600 focus:border-lime-400 pl-10"
+            className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary pl-10"
           />
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <Label htmlFor="blog">블로그</Label>
         <div className="relative">
-          <Rss className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Rss className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-text" />
           <Input
             id="blog"
             placeholder="https://example.com"
             value={blog}
             onChange={(e) => setBlog(e.target.value)}
-            className="bg-gray-800 border-gray-600 focus:border-lime-400 pl-10"
+            className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary pl-10"
           />
         </div>
       </div>
@@ -86,8 +86,7 @@ export function OnboardingStep3({ onNext, data }: StepProps) {
       <div className="pt-4">
         <Button
           onClick={handleSubmit}
-          className="w-full bg-lime-400 hover:bg-lime-500 text-black font-bold text-lg py-6"
-        >
+          className="w-full bg-brand-primary hover:bg-brand-primary/80 text-black font-bold text-lg py-6">
           다음
         </Button>
       </div>
