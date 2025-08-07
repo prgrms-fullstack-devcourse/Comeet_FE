@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { LocationSelector } from "@/components/common/LocationSelector";
 
 const MAX_AGE_LIMIT = 120;
 
@@ -27,6 +28,9 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
     data.experience ? `${data.experience}년차` : ""
   );
   const [bio, setBio] = useState(data.bio || "");
+  const [location, setLocation] = useState<{ lng: number; lat: number } | null>(
+    data.location || null
+  );
   const [isValid, setIsValid] = useState(false);
 
   // 유효성 검사
@@ -37,10 +41,11 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
       Number(age) > 0 &&
       Number(age) < MAX_AGE_LIMIT &&
       experience !== "" &&
-      bio.trim() !== "";
+      bio.trim() !== "" &&
+      location !== null;
 
     setIsValid(isValidForm);
-  }, [nickname, age, experience, bio]);
+  }, [nickname, age, experience, bio, location]);
 
   const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -50,6 +55,11 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
       const numValue = parseInt(value.replace(/[^0-9]/g, ""), 10);
       setAge(numValue);
     }
+  };
+
+  const handleLocationChange = (newLocation: { lng: number; lat: number }) => {
+    console.log("📍 온보딩에서 위치 변경:", newLocation);
+    setLocation(newLocation);
   };
 
   const handleSubmit = () => {
@@ -64,6 +74,7 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
       age: Number(age),
       experience: experienceValue,
       bio: bio.trim(),
+      location: location!,
     });
   };
 
@@ -127,6 +138,15 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary h-[120px] resize-none"
+          />
+        </div>
+
+        {/* 위치 정보 수집 섹션 */}
+        <div className="space-y-3">
+          <Label>위치 정보</Label>
+          <LocationSelector
+            onLocationChange={handleLocationChange}
+            initialLocation={data.location}
           />
         </div>
       </div>

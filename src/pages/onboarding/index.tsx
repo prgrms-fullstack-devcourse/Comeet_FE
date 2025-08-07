@@ -1,8 +1,8 @@
 import { useFunnel } from "@use-funnel/react-router-dom";
-import { OnboardingStep1 } from "@/pages/onboarding/__components/OnboardingStep1";
-import { OnboardingStep2 } from "@/pages/onboarding/__components/OnboardingStep2";
-import { OnboardingStep3 } from "@/pages/onboarding/__components/OnboardingStep3";
-import { OnboardingStep4 } from "@/pages/onboarding/__components/OnboardingStep4";
+import { OnboardingStep1 } from "@/pages/onboarding/_components/OnboardingStep1";
+import { OnboardingStep2 } from "@/pages/onboarding/_components/OnboardingStep2";
+import { OnboardingStep3 } from "@/pages/onboarding/_components/OnboardingStep3";
+import { OnboardingStep4 } from "@/pages/onboarding/_components/OnboardingStep4";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import { ArrowLeft } from "lucide-react";
