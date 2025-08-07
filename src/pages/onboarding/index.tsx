@@ -141,7 +141,7 @@ export function OnboardingPage() {
         leftIcon={canGoBack ? <ArrowLeft /> : undefined}
         onLeftClick={canGoBack ? handleBack : undefined}
       />
-      <div className="w-full pt-8">
+      <div className="w-full pt-22">
         {funnel.step !== "Complete" && (
           <div className="bg-brand-surface rounded-full h-2 mb-4 mx-6">
             <div
