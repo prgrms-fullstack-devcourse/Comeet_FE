@@ -62,7 +62,7 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
   };
 
   return (
-    <div className="flex flex-col min-h-[75vh]">
+    <div className="flex flex-col min-h-[70vh]">
       <div className="flex-grow space-y-6">
         <div className="space-y-3">
           <Label htmlFor="nickname">닉네임</Label>

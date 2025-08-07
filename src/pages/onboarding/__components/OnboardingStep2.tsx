@@ -56,7 +56,7 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
   };
 
   return (
-    <div className="dark flex flex-col min-h-[75vh]">
+    <div className="dark flex flex-col min-h-[70vh]">
       <div className="flex-grow space-y-8">
         {/* 포지션 */}
         <PositionSelector
