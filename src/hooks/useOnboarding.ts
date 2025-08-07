@@ -1,51 +1,82 @@
-import { useMutation } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import type { OnboardingData } from '@/pages/onboarding/OnboardingPage';
+import { useMutation } from "@tanstack/react-query";
+import type { OnboardingData } from "@/pages/onboarding/OnboardingPage";
+
+interface UpdateUserPayload {
+  nickname?: string;
+  age?: number;
+  experience?: number;
+  bio?: string;
+  positionId?: number;
+  techIds?: number[];
+  interestIds?: number[];
+  linkedIn?: string;
+  email?: string;
+  instagram?: string;
+  blog?: string;
+}
+
+const TEST_JWT =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZ2l0aHViSWQiOiIxMzA2NzUxMzQiLCJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTAwMDAwMDAwMDAwMDAwMDB9.uwQg26GHjxwskdZGI39zPx1zfIUhZZMokqOXlEnTsqc";
 
 const updateUserProfile = async (data: OnboardingData) => {
-  const payload: Partial<OnboardingData> = { ...data };
+  const payload: UpdateUserPayload = {
+    nickname: data.nickname,
+    age: data.age,
+    experience: data.experience,
+    bio: data.bio,
+    positionId: data.position,
+    techIds: data.techStack,
+    interestIds: data.interests,
+    linkedIn: data.linkedIn,
+    email: data.email,
+    instagram: data.instagram,
+    blog: data.blog,
+  };
 
-  if (!payload.email) delete payload.email;
-  if (!payload.linkedIn) delete payload.linkedIn;
-  if (!payload.instagram) delete payload.instagram;
-  if (!payload.blog) delete payload.blog;
-
-  const sessionId = sessionStorage.getItem("sessionId"); 
-  if (!sessionId) {
-    throw new Error('인증 정보가 없습니다. 다시 로그인해주세요.');
-  }
+  Object.keys(payload).forEach((key) => {
+    const typedKey = key as keyof UpdateUserPayload;
+    if (
+      payload[typedKey] === undefined ||
+      payload[typedKey] === null ||
+      payload[typedKey] === ""
+    ) {
+      delete payload[typedKey];
+    }
+  });
 
   const res = await fetch(`/api/users`, {
-    method: 'PATCH',
+    method: "PATCH",
     headers: {
-      'Content-Type': 'application/json',
-      "Authorization": `Bearer ${sessionId}`, 
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.message?.[0] || '프로필 업데이트에 실패했습니다.');
+    let errorMsg = "프로필 업데이트에 실패했습니다.";
+    try {
+      const errorData = await res.json();
+      if (Array.isArray(errorData.message)) {
+        errorMsg = errorData.message[0];
+      } else if (typeof errorData.message === "string") {
+        errorMsg = errorData.message;
+      }
+    } catch {}
+    throw new Error(errorMsg);
   }
 
-  if (res.status !== 204) {
-    return res.json();
+  if (res.status === 204 || res.status === 205) {
+    return;
   }
+  return res.json();
 };
 
 export function useUpdateUserProfile() {
-  const navigate = useNavigate();
-
-  return useMutation({
+  return useMutation<void, Error, OnboardingData>({
     mutationFn: updateUserProfile,
-    onSuccess: () => {
-      toast.success('프로필이 저장되었습니다.');
-      navigate('/');
-    },
+    onSuccess: () => {},
     onError: (error) => {
-      toast.error(error.message || '프로필 저장 중 에러가 발생했습니다.');
-    }
+      throw error;
+    },
   });
 }

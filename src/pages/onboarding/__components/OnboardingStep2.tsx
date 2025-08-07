@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { OnboardingData } from "@/pages/onboarding/OnboardingPage";
+import { usePositionsAndInterests, useTechSearch } from "@/hooks/useTags";
+import type { PositionDTO, TypeDTO } from "@/hooks/useTags";
+import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { Check, ChevronsUpDown, X, Frown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Command,
@@ -10,6 +13,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -24,119 +28,15 @@ import {
 } from "@/components/ui/accordion";
 import { Label } from "@/components/ui/label";
 
-const POSITION_DATA = [
-  {
-    category: "개발",
-    positions: [
-      {
-        id: 101,
-        name: "Frontend Developer",
-        description: "React, Vue, Angular 등 프론트엔드 기술",
-      },
-      {
-        id: 102,
-        name: "Backend Developer",
-        description: "Node.js, Python, Java 등 서버 개발",
-      },
-      {
-        id: 103,
-        name: "Fullstack Developer",
-        description: "프론트엔드와 백엔드 모두 가능",
-      },
-      {
-        id: 104,
-        name: "Mobile Developer",
-        description: "iOS, Android, React Native, Flutter",
-      },
-      {
-        id: 105,
-        name: "Game Developer",
-        description: "게임 엔진, 게임 기획 및 개발",
-      },
-      {
-        id: 106,
-        name: "Embedded Developer",
-        description: "IoT, 하드웨어, 임베디드 시스템",
-      },
-      {
-        id: 107,
-        name: "Blockchain Developer",
-        description: "블록체인, 스마트 컨트랙트",
-      },
-    ],
-  },
-  {
-    category: "인프라",
-    positions: [
-      {
-        id: 201,
-        name: "DevOps Engineer",
-        description: "CI/CD, 클라우드, 인프라 관리",
-      },
-      {
-        id: 202,
-        name: "Security Engineer",
-        description: "보안 시스템, 취약점 분석",
-      },
-    ],
-  },
-  {
-    category: "데이터",
-    positions: [
-      {
-        id: 301,
-        name: "AI/ML Engineer",
-        description: "머신러닝, 딥러닝, 데이터 분석",
-      },
-      {
-        id: 302,
-        name: "Data Engineer",
-        description: "데이터 파이프라인, 빅데이터 처리",
-      },
-      {
-        id: 303,
-        name: "Data Scientist",
-        description: "데이터 분석, 통계, 비즈니스 인사이트",
-      },
-    ],
-  },
-  {
-    category: "기획/디자인",
-    positions: [
-      {
-        id: 501,
-        name: "Product Manager",
-        description: "제품 기획, 프로젝트 관리",
-      },
-      {
-        id: 502,
-        name: "UI/UX Designer",
-        description: "사용자 경험, 인터페이스 디자인",
-      },
-      { id: 503, name: "QA Engineer", description: "테스트, 품질 관리" },
-    ],
-  },
-];
-const ALL_STACKS = [
-  { id: 1, value: "react", label: "React" },
-  { id: 2, value: "typescript", label: "TypeScript" },
-  { id: 3, value: "javascript", label: "JavaScript" },
-  { id: 4, value: "next.js", label: "Next.js" },
-  { id: 5, value: "vue", label: "Vue.js" },
-  { id: 6, value: "java", label: "Java" },
-  { id: 7, value: "spring", label: "Spring" },
-  { id: 8, value: "python", label: "Python" },
-  { id: 9, value: "django", label: "Django" },
-];
-const INTEREST_TOPICS = [
-  { id: 1, name: "업계 동향" },
-  { id: 2, name: "직무 정보" },
-  { id: 3, name: "커피챗" },
-  { id: 4, name: "정보 공유" },
-  { id: 5, name: "취업 준비" },
-  { id: 6, name: "자기계발" },
-  { id: 7, name: "이벤트" },
-  { id: 8, name: "기타" },
+const RECOMMENDED_STACKS = [
+  { id: 1, value: "React", label: "React" },
+  { id: 2, value: "TypeScript", label: "TypeScript" },
+  { id: 3, value: "JavaScript", label: "JavaScript" },
+  { id: 4, value: "Next.js", label: "Next.js" },
+  { id: 6, value: "Java", label: "Java" },
+  { id: 7, value: "Spring", label: "Spring" },
+  { id: 8, value: "Python", label: "Python" },
+  { id: 11, value: "NestJS", label: "NestJS" },
 ];
 
 interface StepProps {
@@ -145,26 +45,86 @@ interface StepProps {
 }
 
 export function OnboardingStep2({ onNext, data }: StepProps) {
+  const {
+    data: tagsData,
+    isLoading: isLoadingTags,
+    isError,
+    error,
+  } = usePositionsAndInterests();
+
   const [position, setPosition] = useState<number | undefined>(data.position);
   const [open, setOpen] = useState(false);
-  const [selectedStackIds, setSelectedStackIds] = useState<number[]>(
-    data.techStack || []
+
+  const [techSearchKeyword, setTechSearchKeyword] = useState("");
+  const debouncedSearchKeyword = useDebounce(techSearchKeyword, 300);
+  const { data: techResults, isFetching: isFetchingTechs } = useTechSearch(
+    debouncedSearchKeyword
   );
+
+  const [selectedTechs, setSelectedTechs] = useState<Map<number, string>>(
+    () =>
+      new Map(
+        data.techStack?.map((id) => {
+          const stack = RECOMMENDED_STACKS.find((s) => s.id === id);
+          return [id, stack?.label || ""];
+        }) || []
+      )
+  );
+
   const [selectedInterestIds, setSelectedInterestIds] = useState<number[]>(
     data.interests || []
   );
 
-  const handleSelectStack = (stackId: number) => {
-    const newStackIds = selectedStackIds.includes(stackId)
-      ? selectedStackIds.filter((id) => id !== stackId)
-      : [...selectedStackIds, stackId];
-    setSelectedStackIds(newStackIds);
+  const positionGroups = useMemo(() => {
+    if (!tagsData) return {};
+    return tagsData.positions.reduce(
+      (acc: Record<string, PositionDTO[]>, pos: PositionDTO) => {
+        (acc[pos.field] = acc[pos.field] || []).push(pos);
+        return acc;
+      },
+      {}
+    );
+  }, [tagsData]);
+
+  useEffect(() => {
+    if (!techResults) return;
+
+    const newSelectedTechs = new Map(selectedTechs);
+    let isChanged = false;
+
+    newSelectedTechs.forEach((value, id) => {
+      if (!value) {
+        const foundTech = techResults.find((tech) => tech.id === id);
+        if (foundTech) {
+          newSelectedTechs.set(id, foundTech.value);
+          isChanged = true;
+        }
+      }
+    });
+
+    if (isChanged) {
+      setSelectedTechs(newSelectedTechs);
+    }
+  }, [techResults]);
+
+  const customFilter = (value: string, search: string): number => {
+    return value.toLowerCase().includes(search.toLowerCase()) ? 1 : 0;
+  };
+
+  const handleSelectStack = (techId: number, techValue: string) => {
+    const newSelectedTechs = new Map(selectedTechs);
+    if (newSelectedTechs.has(techId)) {
+      newSelectedTechs.delete(techId);
+    } else {
+      newSelectedTechs.set(techId, techValue);
+    }
+    setSelectedTechs(newSelectedTechs);
     setOpen(false);
   };
   const handleRemoveStack = (stackIdToRemove: number) => {
-    setSelectedStackIds(
-      selectedStackIds.filter((id) => id !== stackIdToRemove)
-    );
+    const newSelectedTechs = new Map(selectedTechs);
+    newSelectedTechs.delete(stackIdToRemove);
+    setSelectedTechs(newSelectedTechs);
   };
 
   const handleInterestToggle = (topicId: number) => {
@@ -175,7 +135,7 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
   };
 
   const handleSubmit = () => {
-    if (!position) {
+    if (position == null) {
       alert("포지션을 선택해주세요.");
       return;
     }
@@ -185,7 +145,7 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
     }
     onNext({
       position: position,
-      techStack: selectedStackIds,
+      techStack: Array.from(selectedTechs.keys()),
       interests: selectedInterestIds,
     });
   };
@@ -199,41 +159,49 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
             type="single"
             collapsible
             className="w-full border rounded-md border-gray-700"
+            disabled={isLoadingTags || isError}
           >
-            {POSITION_DATA.map((cat) => (
-              <AccordionItem
-                key={cat.category}
-                value={cat.category}
-                className="px-4 border-b-gray-700 last:border-b-0"
-              >
-                <AccordionTrigger className="hover:no-underline">
-                  {cat.category}
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex flex-col gap-2 pt-2">
-                    {cat.positions.map((pos) => (
-                      <Button
-                        key={pos.id}
-                        variant="outline"
-                        onClick={() => setPosition(pos.id)}
-                        className={cn(
-                          "h-auto justify-start text-left whitespace-normal border-gray-600 bg-gray-800",
-                          position === pos.id &&
-                            "border-lime-400 text-lime-400 border-2"
-                        )}
-                      >
-                        <div className="flex flex-col">
-                          <span className="font-bold">{pos.name}</span>
-                          <span className="text-xs text-gray-400">
-                            {pos.description}
-                          </span>
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
+            {isLoadingTags && (
+              <div className="p-4 text-gray-400">
+                포지션 목록을 불러오는 중...
+              </div>
+            )}
+            {isError && (
+              <div className="p-4 text-red-500 flex items-center gap-2">
+                <Frown size={18} /> {error.message}
+              </div>
+            )}
+            {!isLoadingTags &&
+              !isError &&
+              Object.entries(positionGroups).map(([field, positions]) => (
+                <AccordionItem
+                  key={field}
+                  value={field}
+                  className="px-4 border-b-gray-700 last:border-b-0"
+                >
+                  <AccordionTrigger className="hover:no-underline">
+                    {field}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-col gap-2 pt-2">
+                      {positions.map((pos: PositionDTO) => (
+                        <Button
+                          key={pos.id}
+                          variant="outline"
+                          onClick={() => setPosition(pos.id)}
+                          className={cn(
+                            "h-auto justify-start text-left whitespace-normal border-gray-600 bg-gray-800",
+                            position === pos.id &&
+                              "border-lime-400 text-lime-400 border-2"
+                          )}
+                        >
+                          <span className="font-bold">{pos.role}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
           </Accordion>
         </div>
 
@@ -247,68 +215,119 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
                 aria-expanded={open}
                 className="w-full justify-between bg-gray-800 border-gray-600 hover:bg-gray-700 hover:text-white"
               >
-                {selectedStackIds.length > 0
-                  ? `${selectedStackIds.length}개 선택됨`
-                  : "스택을 선택하세요..."}
+                {selectedTechs.size > 0
+                  ? `${selectedTechs.size}개 선택됨`
+                  : "스택을 검색하여 추가하세요..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[380px] p-0 bg-gray-900 border-gray-700 text-white">
-              <Command>
+              <Command filter={customFilter}>
                 <CommandInput
                   placeholder="스택 검색..."
-                  className="text-white"
+                  onValueChange={setTechSearchKeyword}
+                  className="text-black"
                 />
-                <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
-                <CommandGroup>
-                  {ALL_STACKS.map((stack) => (
-                    <CommandItem
-                      key={stack.id}
-                      value={stack.label}
-                      onSelect={() => handleSelectStack(stack.id)}
-                      className="aria-selected:bg-gray-700"
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          selectedStackIds.includes(stack.id)
-                            ? "opacity-100"
-                            : "opacity-0"
-                        )}
-                      />
-                      {stack.label}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
+                <CommandList>
+                  {isFetchingTechs && (
+                    <div className="p-2 text-sm text-gray-400">검색 중...</div>
+                  )}
+
+                  {!debouncedSearchKeyword && !isFetchingTechs && (
+                    <CommandGroup heading="추천 스택">
+                      {RECOMMENDED_STACKS.map((stack) => (
+                        <CommandItem
+                          key={stack.id}
+                          value={stack.label}
+                          onSelect={() =>
+                            handleSelectStack(stack.id, stack.label)
+                          }
+                          className="aria-selected:bg-gray-700"
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedTechs.has(stack.id)
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          {stack.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+
+                  {!isFetchingTechs &&
+                    debouncedSearchKeyword &&
+                    techResults?.length === 0 && (
+                      <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
+                    )}
+
+                  {debouncedSearchKeyword && (
+                    <CommandGroup heading="검색 결과">
+                      {techResults?.map((tech: TypeDTO) => (
+                        <CommandItem
+                          key={tech.id}
+                          value={tech.value}
+                          onSelect={() =>
+                            handleSelectStack(tech.id, tech.value)
+                          }
+                          className="aria-selected:bg-gray-700"
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedTechs.has(tech.id)
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          {tech.value}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
+                </CommandList>
               </Command>
             </PopoverContent>
           </Popover>
           <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border border-gray-700 rounded-md">
-            {selectedStackIds.map((stackId) => {
-              const stack = ALL_STACKS.find((s) => s.id === stackId);
-              return (
-                <Badge
-                  key={stackId}
-                  variant="secondary"
-                  className="flex items-center gap-x-1 bg-lime-400 text-black"
+            {Array.from(selectedTechs.entries()).map(([id, value]) => (
+              <Badge
+                key={id}
+                variant="secondary"
+                className="flex items-center gap-x-1 bg-lime-400 text-black"
+              >
+                <span>{value || `(이름 확인 중...)`}</span>
+                <button
+                  onClick={() => handleRemoveStack(id)}
+                  className="rounded-full hover:bg-black/20"
                 >
-                  <span>{stack?.label}</span>
-                  <button
-                    onClick={() => handleRemoveStack(stackId)}
-                    className="rounded-full hover:bg-black/20"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              );
-            })}
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
           </div>
         </div>
 
         <div className="space-y-3">
           <Label>관심 분야</Label>
           <div className="grid grid-cols-4 gap-2">
-            {INTEREST_TOPICS.map((topic) => (
+            {isLoadingTags &&
+              Array.from({ length: 8 }).map((_, i) => (
+                <Button
+                  key={i}
+                  disabled
+                  className="bg-gray-800 border-gray-700 h-9"
+                ></Button>
+              ))}
+            {isError && (
+              <div className="col-span-4 p-4 text-red-500 flex items-center gap-2">
+                <Frown size={18} /> 데이터 로딩 실패
+              </div>
+            )}
+            {tagsData?.interests.map((topic: TypeDTO) => (
               <Button
                 key={topic.id}
                 variant="outline"
@@ -319,7 +338,7 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
                     "border-lime-400 text-lime-400 border-2"
                 )}
               >
-                {topic.name}
+                {topic.value}
               </Button>
             ))}
           </div>
@@ -329,7 +348,8 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
       <div className="pt-4">
         <Button
           onClick={handleSubmit}
-          className="w-full bg-lime-400 hover:bg-lime-500 text-black font-bold text-lg py-6"
+          disabled={isLoadingTags}
+          className="w-full bg-lime-400 hover:bg-lime-500 text-black font-bold text-lg py-6 disabled:bg-gray-500"
         >
           다음
         </Button>

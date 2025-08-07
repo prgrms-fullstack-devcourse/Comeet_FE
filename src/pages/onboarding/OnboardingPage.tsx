@@ -25,23 +25,33 @@ export function OnboardingPage() {
   const [onboardingData, setOnboardingData] = useState<Partial<OnboardingData>>(
     {}
   );
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const { mutate: updateUserProfile, isPending } = useUpdateUserProfile();
 
   const TOTAL_STEPS = 4;
 
   const handleNext = (currentStepData: Partial<OnboardingData>) => {
+    if (step > TOTAL_STEPS) return; // step 범위 체크
+    setErrorMsg(null);
+
     const newData = { ...onboardingData, ...currentStepData };
     setOnboardingData(newData);
 
     if (step < TOTAL_STEPS - 1) {
       setStep((prev) => prev + 1);
     } else {
-      console.log("최종 데이터:", newData);
-      updateUserProfile(newData as OnboardingData);
+      updateUserProfile(newData as OnboardingData, {
+        onSuccess: () => {
+          setStep(TOTAL_STEPS);
+        },
+        onError: (err: any) => {
+          setErrorMsg("프로필 저장에 실패했습니다. 다시 시도해주세요.");
+        },
+      });
     }
   };
 
-  const progress = (step / TOTAL_STEPS) * 100;
+  const progress = Math.min((step / TOTAL_STEPS) * 100, 100);
 
   const getStepTitle = () => {
     switch (step) {
@@ -77,6 +87,9 @@ export function OnboardingPage() {
           </CardHeader>
         )}
         <CardContent>
+          {errorMsg && (
+            <div className="mb-4 text-red-500 text-sm">{errorMsg}</div>
+          )}
           {step === 1 && (
             <OnboardingStep1 onNext={handleNext} data={onboardingData} />
           )}
