@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, ChevronsUpDown, X } from "lucide-react";
@@ -16,8 +16,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
-import { fetchStacks } from "@/lib/api";
-import type { Stack } from "@/types/filter.types";
+import { useStacks } from "@/hooks/queries/useTags";
+import type { Stack } from "@/types/tags.types";
 
 interface StackSelectorProps {
   selectedStackIds: number[];
@@ -32,24 +32,8 @@ export const StackSelector = ({
   label = "기술 스택 / 분야",
   maxSelection,
 }: StackSelectorProps) => {
-  const [stacks, setStacks] = useState<Stack[]>([]);
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadStacks = async () => {
-      try {
-        const fetchedStacks = await fetchStacks();
-        setStacks(fetchedStacks);
-      } catch (error) {
-        console.error("스택 로딩 실패:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadStacks();
-  }, []);
+  const { data: stacks, isLoading } = useStacks();
 
   const handleSelectStack = (stackId: number) => {
     const newStackIds = selectedStackIds.includes(stackId)
@@ -69,6 +53,10 @@ export const StackSelector = ({
 
   if (isLoading) {
     return <div className="text-center">로딩 중...</div>;
+  }
+
+  if (!stacks) {
+    return <div className="text-center">기술 스택을 불러올 수 없습니다.</div>;
   }
 
   return (
@@ -102,7 +90,7 @@ export const StackSelector = ({
               {stacks.map((stack) => (
                 <CommandItem
                   key={stack.id}
-                  value={stack.label}
+                  value={stack.value}
                   onSelect={() => handleSelectStack(stack.id)}
                   className="aria-selected:bg-brand-primary text-white">
                   <Check
@@ -113,7 +101,7 @@ export const StackSelector = ({
                         : "opacity-0"
                     )}
                   />
-                  {stack.label}
+                  {stack.value}
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -129,7 +117,7 @@ export const StackSelector = ({
                 key={stackId}
                 variant="secondary"
                 className="flex items-center gap-x-1 bg-brand-primary text-black">
-                <span>{stack?.label}</span>
+                <span>{stack?.value}</span>
                 <button
                   onClick={() => handleRemoveStack(stackId)}
                   className="rounded-full hover:bg-black/20">
