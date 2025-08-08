@@ -209,7 +209,7 @@ export function OnboardingPage() {
                   data={context}
                 />
               )}
-              Complete={() => <OnboardingStep4 />}
+              Complete={({ context }) => <OnboardingStep4 data={context} />}
             />
           </CardContent>
         </Card>
