@@ -1,21 +1,29 @@
-export interface User {
+export interface LoginResponse {
+  accessToken?: string;
+  sessionId?: string;
+  result?: {
+    nickname: string;
+    avatar: string;
+    accessToken: string;
+  };
+}
+
+export type FetchLoginResponse = LoginResponse;
+
+export interface SignUpRequest {
   nickname: string;
   age: number;
   experience: number;
   bio: string;
-  position: number;
-  techStack: number[];
-  interests: number[];
-  location: [number, number];
+  location: {
+    lng: number;
+    lat: number;
+  };
+  positionId: number;
+  techIds: number[];
+  interestIds: number[];
   email?: string;
-  linkedin?: string;
   instagram?: string;
+  linkedIn?: string;
   blog?: string;
 }
-
-export interface LoginResponse {
-  accessToken: string;
-  sessionId: string;
-}
-
-export type FetchLoginResponse = LoginResponse;
