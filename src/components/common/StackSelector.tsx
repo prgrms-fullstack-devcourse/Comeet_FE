@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { useStacks } from "@/hooks/queries/useTags";
-import type { Stack } from "@/types/tags.types";
 
 interface StackSelectorProps {
   selectedStackIds: number[];
