@@ -10,7 +10,10 @@ export default function BottomNavigation() {
     <nav className="w-full border-t border-brand-surface h-14 flex">
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon;
-        const isActive = location.pathname === item.path;
+        const isActive =
+          item.path === "/board"
+            ? location.pathname.startsWith("/board")
+            : location.pathname === item.path;
 
         return (
           <Button
