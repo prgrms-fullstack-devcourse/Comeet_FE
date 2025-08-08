@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Bell, Plus, Search } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import type { Post } from "../../types/board.types";
-import { fetchPosts } from "../../lib/api";
+import { fetchPosts } from "../../lib/api/posts";
 import { AppTabs } from "../../components/common/AppTabs";
 import { AddPostModal } from "./_components/modal/AddPostModal";
 import { ListItem } from "./_components/ListItem";
