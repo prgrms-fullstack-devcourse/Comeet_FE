@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { fetchLogin } from "@/lib/api";
+import { fetchLogin } from "@/lib/api/auth";
 
 export const useGitHubCallback = () => {
   const [searchParams] = useSearchParams();
@@ -15,11 +15,21 @@ export const useGitHubCallback = () => {
       sessionStorage.removeItem("github_oauth_state");
 
       if (result.sessionId && !result.accessToken) {
-        navigate("/onboarding", { replace: true });
-      } else if (result.accessToken) {
-        localStorage.setItem("access_token", result.accessToken);
-        localStorage.setItem("session_id", result.sessionId);
+        navigate(
+          `/onboarding?sessionId=${encodeURIComponent(result.sessionId)}`,
+          { replace: true }
+        );
+      } else if (result.accessToken || result.result) {
+        // accessToken이 있거나 result가 있으면 (온보딩 완료된 사용자)
+        if (result.accessToken) {
+          localStorage.setItem("access_token", result.accessToken);
+        }
+        if (result.sessionId) {
+          localStorage.setItem("session_id", result.sessionId);
+        }
         navigate("/board", { replace: true });
+      } else {
+        console.log(" 예상치 못한 응답:", result);
       }
     },
     onError: (error) => {
