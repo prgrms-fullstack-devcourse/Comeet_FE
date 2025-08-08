@@ -27,6 +27,13 @@ export const useGitHubCallback = () => {
         if (result.sessionId) {
           localStorage.setItem("session_id", result.sessionId);
         }
+
+        if (result.result) {
+          localStorage.setItem("user_nickname", result.result.nickname);
+          localStorage.setItem("user_avatar", result.result.avatar);
+          localStorage.setItem("access_token", result.result.accessToken);
+        }
+
         navigate("/board", { replace: true });
       } else {
         console.log(" 예상치 못한 응답:", result);
