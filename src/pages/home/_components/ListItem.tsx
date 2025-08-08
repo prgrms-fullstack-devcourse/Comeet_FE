@@ -2,8 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { Post } from "@/types/board.types";
-import { BOARD_CATEGORIES } from "@/constants/board";
+import type { Post } from "@/types/post.types";
 
 interface ListItemProps {
   post: Post;
@@ -11,12 +10,17 @@ interface ListItemProps {
 
 export const ListItem = ({ post }: ListItemProps) => {
   const navigate = useNavigate();
-  const categoryLabel =
-    BOARD_CATEGORIES.find((c) => c.value === post.categoryId.toString())
-      ?.label || "";
 
   const handleClick = () => {
     navigate(`/community/${post.id}`);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("ko-KR", {
+      month: "short",
+      day: "numeric",
+    });
   };
 
   return (
@@ -25,22 +29,22 @@ export const ListItem = ({ post }: ListItemProps) => {
       onClick={handleClick}>
       <CardHeader>
         <Badge className="w-fit p-0 text-left bg-transparent border-none text-brand-primary">
-          {categoryLabel}
+          {post.board.value}
         </Badge>
         <CardTitle className="mt-2">{post.title}</CardTitle>
       </CardHeader>
       <CardContent className="flex justify-between items-center text-xs text-brand-text">
         <span>
-          {post.author} · {post.date}
+          {post.author.nickname} · {formatDate(post.createdAt)}
         </span>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1">
             <Heart className="size-4" aria-label="좋아요" />
-            <span className="w-3">{post.likes}</span>
+            <span className="w-3">{post.nLikes}</span>
           </div>
           <div className="flex items-center space-x-1">
             <MessageCircle className="size-4" aria-label="댓글" />
-            <span className="w-3">{post.comments}</span>
+            <span className="w-3">{post.nComments}</span>
           </div>
         </div>
       </CardContent>
