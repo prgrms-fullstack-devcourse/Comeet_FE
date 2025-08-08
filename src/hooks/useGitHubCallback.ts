@@ -21,13 +21,6 @@ export const useGitHubCallback = () => {
         );
       } else if (result.accessToken || result.result) {
         // accessToken이 있거나 result가 있으면 (온보딩 완료된 사용자)
-        if (result.accessToken) {
-          localStorage.setItem("access_token", result.accessToken);
-        }
-        if (result.sessionId) {
-          localStorage.setItem("session_id", result.sessionId);
-        }
-
         if (result.result) {
           localStorage.setItem("user_nickname", result.result.nickname);
           localStorage.setItem("user_avatar", result.result.avatar);
