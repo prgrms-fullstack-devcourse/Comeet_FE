@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Post } from "@/types/post.types";
+import { formatPostListDate } from "@/lib/date";
 
 interface ListItemProps {
   post: Post;
@@ -13,14 +14,6 @@ export const ListItem = ({ post }: ListItemProps) => {
 
   const handleClick = () => {
     navigate(`/community/${post.id}`);
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("ko-KR", {
-      month: "short",
-      day: "numeric",
-    });
   };
 
   return (
@@ -35,7 +28,7 @@ export const ListItem = ({ post }: ListItemProps) => {
       </CardHeader>
       <CardContent className="flex justify-between items-center text-xs text-brand-text">
         <span>
-          {post.author.nickname} · {formatDate(post.createdAt)}
+          {post.author.nickname} · {formatPostListDate(post.createdAt)}
         </span>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1">

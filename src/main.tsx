@@ -10,7 +10,7 @@ import { MyPage } from "./pages/my/index.tsx";
 import { DeveloperPage } from "./pages/developer/index.tsx";
 import { ExplorePage } from "./pages/explore/index.tsx";
 import { OnboardingPage } from "./pages/onboarding/index.tsx";
-import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
+import { PostDetailPage } from "./pages/community/index.tsx";
 import AuthCallbackPage from "./pages/auth/AuthCallbackPage.tsx";
 import ChatPage from "./pages/chat/index.tsx";
 import SearchPage from "./pages/search/index.tsx";
