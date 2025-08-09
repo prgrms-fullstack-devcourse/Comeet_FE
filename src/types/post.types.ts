@@ -10,6 +10,7 @@ export interface Post {
     nickname: string;
   };
   title: string;
+  content: string;
   nComments: number;
   nLikes: number;
   createdAt: string;
