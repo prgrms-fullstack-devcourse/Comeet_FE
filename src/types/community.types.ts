@@ -1,27 +1,13 @@
-export interface Reply {
-  id: number;
-  author: {
-    name: string;
-    avatarUrl: string;
-  };
-  content: string;
-  createdAt: string;
-  likeCount: number;
-  isLiked: boolean;
-}
-
 export interface Comment {
   id: number;
+  postId: number;
   author: {
-    name: string;
-    avatarUrl: string;
+    nickname: string;
+    avatar: string;
   };
   content: string;
+  editable: boolean;
   createdAt: string;
-  likeCount: number;
-  isLiked: boolean;
-  replyCount: number;
-  replies?: Reply[];
 }
 
 export interface Post {
