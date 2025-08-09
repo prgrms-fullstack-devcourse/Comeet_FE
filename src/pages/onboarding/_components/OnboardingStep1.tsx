@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { OnboardingData } from "@/pages/onboarding/OnboardingPage";
+import { useState, useEffect } from "react";
+import type { OnboardingData } from "@/pages/onboarding/index.tsx";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { LocationSelector } from "@/components/common/LocationSelector";
 
 const MAX_AGE_LIMIT = 120;
 
@@ -27,6 +28,23 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
     data.experience ? `${data.experience}년차` : ""
   );
   const [bio, setBio] = useState(data.bio || "");
+  const [location, setLocation] = useState<{ lng: number; lat: number } | null>(
+    data.location || null
+  );
+  const [isValid, setIsValid] = useState(false);
+
+  useEffect(() => {
+    const isValidForm =
+      nickname.trim() !== "" &&
+      age !== "" &&
+      Number(age) > 0 &&
+      Number(age) < MAX_AGE_LIMIT &&
+      experience !== "" &&
+      bio.trim() !== "" &&
+      location !== null;
+
+    setIsValid(isValidForm);
+  }, [nickname, age, experience, bio, location]);
 
   const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -38,31 +56,28 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
     }
   };
 
+  const handleLocationChange = (newLocation: { lng: number; lat: number }) => {
+    setLocation(newLocation);
+  };
+
   const handleSubmit = () => {
-    if (age === "") {
-      alert("나이를 입력해주세요.");
-      return;
-    }
-    if (Number(age) >= MAX_AGE_LIMIT) {
-      alert(`나이는 ${MAX_AGE_LIMIT} 미만으로 입력해주세요.`);
-      return;
-    }
-    if (age < 1) {
-      alert("나이를 올바르게 입력해주세요.");
-      return;
-    }
-    if (!nickname || !age || !experience || !bio) {
-      alert("모든 항목을 입력해주세요.");
+    if (!isValid) {
+      alert("모든 항목을 올바르게 입력해주세요.");
       return;
     }
 
     const experienceValue = parseInt(experience, 10);
-
-    onNext({ nickname, age: Number(age), experience: experienceValue, bio });
+    onNext({
+      nickname: nickname.trim(),
+      age: Number(age),
+      experience: experienceValue,
+      bio: bio.trim(),
+      location: location!,
+    });
   };
 
   return (
-    <div className="flex flex-col min-h-[75vh]">
+    <div className="flex flex-col min-h-[70vh]">
       <div className="flex-grow space-y-6">
         <div className="space-y-3">
           <Label htmlFor="nickname">닉네임</Label>
@@ -89,6 +104,11 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
                 "border-red-500 focus:border-red-500 text-red-500"
             )}
           />
+          {Number(age) >= MAX_AGE_LIMIT && (
+            <p className="text-red-500 text-sm">
+              나이는 {MAX_AGE_LIMIT} 미만으로 입력해주세요.
+            </p>
+          )}
         </div>
         <div className="space-y-3">
           <Label htmlFor="experience">경력</Label>
@@ -118,11 +138,25 @@ export function OnboardingStep1({ onNext, data }: StepProps) {
             className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary h-[120px] resize-none"
           />
         </div>
+
+        <div className="space-y-3">
+          <Label>위치 정보</Label>
+          <LocationSelector
+            onLocationChange={handleLocationChange}
+            initialLocation={data.location}
+          />
+        </div>
       </div>
       <div className="pt-4">
         <Button
           onClick={handleSubmit}
-          className="w-full bg-lime-400 hover:bg-lime-500 text-black font-bold text-lg py-6">
+          disabled={!isValid}
+          className={cn(
+            "w-full font-bold text-lg py-6",
+            isValid
+              ? "bg-brand-primary hover:bg-brand-primary/90 text-black"
+              : "bg-gray-400 text-gray-600 cursor-not-allowed"
+          )}>
           다음
         </Button>
       </div>

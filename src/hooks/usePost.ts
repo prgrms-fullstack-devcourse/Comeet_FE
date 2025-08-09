@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Post, Comment } from "@/types/community";
+import type { Post, Comment } from "@/types/community.types";
 
 const fetchPost = async (postId: string): Promise<Post> => {
   const res = await fetch(`/api/posts/${postId}`);

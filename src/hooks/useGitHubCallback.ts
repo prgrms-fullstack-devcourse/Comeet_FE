@@ -1,7 +1,7 @@
-import { useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { fetchLogin } from '@/lib/api';
+import { useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { fetchLogin } from "@/lib/api/auth";
 
 export const useGitHubCallback = () => {
   const [searchParams] = useSearchParams();
@@ -12,20 +12,29 @@ export const useGitHubCallback = () => {
     mutationFn: fetchLogin,
     retry: false,
     onSuccess: (result) => {
-      sessionStorage.removeItem('github_oauth_state');
+      sessionStorage.removeItem("github_oauth_state");
 
-      if (result.status === 200) {
-        localStorage.setItem('access_token', result.accessToken);
-        localStorage.setItem('session_id', result.sessionId);
-        navigate('/', { replace: true });
-      } else if (result.status === 210) {
-        sessionStorage.setItem('github_id', result.githubId);
-        navigate('/onboarding', { replace: true });
+      if (result.sessionId && !result.accessToken) {
+        navigate(
+          `/onboarding?sessionId=${encodeURIComponent(result.sessionId)}`,
+          { replace: true }
+        );
+      } else if (result.accessToken || result.result) {
+        // accessToken이 있거나 result가 있으면 (온보딩 완료된 사용자)
+        if (result.result) {
+          localStorage.setItem("user_nickname", result.result.nickname);
+          localStorage.setItem("user_avatar", result.result.avatar);
+          localStorage.setItem("access_token", result.result.accessToken);
+        }
+
+        navigate("/board", { replace: true });
+      } else {
+        console.log(" 예상치 못한 응답:", result);
       }
     },
     onError: (error) => {
-      console.error('OAuth callback error:', error);
-    }
+      console.error("OAuth callback error:", error);
+    },
   });
 
   useEffect(() => {
@@ -34,26 +43,26 @@ export const useGitHubCallback = () => {
     const handleCallback = () => {
       hasProcessed.current = true;
 
-      const code = searchParams.get('code');
-      const error = searchParams.get('error');
-      const state = searchParams.get('state');
+      const code = searchParams.get("code");
+      const error = searchParams.get("error");
+      const state = searchParams.get("state");
 
       if (error) {
-        navigate('/login', { replace: true });
-        console.error('GitHub OAuth 에러:', error);
+        navigate("/login", { replace: true });
+        console.error("GitHub OAuth 에러:", error);
         return;
       }
 
       if (!code) {
-        navigate('/login', { replace: true });
-        console.log('GitHub에서 인증 코드를 받지 못했습니다');
+        navigate("/login", { replace: true });
+        console.log("GitHub에서 인증 코드를 받지 못했습니다");
         return;
       }
 
-      const storedState = sessionStorage.getItem('github_oauth_state');
+      const storedState = sessionStorage.getItem("github_oauth_state");
       if (state !== storedState) {
-        navigate('/login', { replace: true });
-        console.log('보안 검증 실패');
+        navigate("/login", { replace: true });
+        console.log("보안 검증 실패");
         return;
       }
 

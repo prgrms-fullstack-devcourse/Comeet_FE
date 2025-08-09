@@ -1,4 +1,4 @@
-import type { Comment } from "@/types/community";
+import type { Comment } from "@/types/community.types";
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle } from "lucide-react";
 import { ReplyItem } from "./ReplyItem";

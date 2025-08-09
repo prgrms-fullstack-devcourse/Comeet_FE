@@ -1,20 +1,11 @@
-import { useState } from "react";
-import type { OnboardingData } from "@/pages/onboarding/OnboardingPage";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { PositionSelector } from "@/components/common/PositionSelector";
 import { StackSelector } from "@/components/common/StackSelector";
-const INTEREST_TOPICS = [
-  { id: 1, name: "업계 동향" },
-  { id: 2, name: "직무 정보" },
-  { id: 3, name: "커피챗" },
-  { id: 4, name: "정보 공유" },
-  { id: 5, name: "취업 준비" },
-  { id: 6, name: "자기계발" },
-  { id: 7, name: "이벤트" },
-  { id: 8, name: "기타" },
-];
+import { usePositionsInterests } from "@/hooks/queries/useTags";
+import { cn } from "@/lib/utils";
+import type { OnboardingData } from "../index";
 
 interface StepProps {
   onNext: (data: Partial<OnboardingData>) => void;
@@ -22,13 +13,28 @@ interface StepProps {
 }
 
 export function OnboardingStep2({ onNext, data }: StepProps) {
-  const [position, setPosition] = useState<number | undefined>(data.position);
+  const [position, setPosition] = useState<number | null>(
+    data.position || null
+  );
   const [selectedStackIds, setSelectedStackIds] = useState<number[]>(
     data.techStack || []
   );
   const [selectedInterestIds, setSelectedInterestIds] = useState<number[]>(
     data.interests || []
   );
+  const [isValid, setIsValid] = useState(false);
+
+  const { data: positionsInterestsData, isLoading } = usePositionsInterests();
+
+  // 유효성 검사
+  useEffect(() => {
+    const isValidForm =
+      position !== null &&
+      selectedStackIds.length > 0 &&
+      selectedInterestIds.length > 0;
+
+    setIsValid(isValidForm);
+  }, [position, selectedStackIds, selectedInterestIds]);
 
   const handleInterestToggle = (topicId: number) => {
     const newInterestIds = selectedInterestIds.includes(topicId)
@@ -40,28 +46,33 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
   };
 
   const handleSubmit = () => {
-    if (!position) {
-      alert("포지션을 선택해주세요.");
+    if (!isValid) {
+      alert("포지션, 기술 스택, 관심 분야를 모두 선택해주세요.");
       return;
     }
-    if (selectedInterestIds.length === 0) {
-      alert("관심 분야를 1개 이상 선택해주세요.");
-      return;
-    }
+
     onNext({
-      position: position,
+      position: position!,
       techStack: selectedStackIds,
       interests: selectedInterestIds,
     });
   };
 
+  if (isLoading) {
+    return <div className="text-center">로딩 중...</div>;
+  }
+
+  if (!positionsInterestsData?.interests) {
+    return <div className="text-center">관심사를 불러올 수 없습니다.</div>;
+  }
+
   return (
-    <div className="dark flex flex-col min-h-[75vh]">
+    <div className="dark flex flex-col min-h-[70vh]">
       <div className="flex-grow space-y-8">
         {/* 포지션 */}
         <PositionSelector
-          selectedPosition={position || null}
-          onPositionChange={(positionId) => setPosition(positionId)}
+          selectedPosition={position}
+          onPositionChange={setPosition}
         />
 
         {/* 기술 스택 */}
@@ -73,17 +84,17 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
         <div className="space-y-3">
           <Label>관심 분야 (최대 3개)</Label>
           <div className="grid grid-cols-4 gap-2">
-            {INTEREST_TOPICS.map((topic) => (
+            {positionsInterestsData.interests.map((interest) => (
               <Button
-                key={topic.id}
+                key={interest.id}
                 variant="outline"
-                onClick={() => handleInterestToggle(topic.id)}
+                onClick={() => handleInterestToggle(interest.id)}
                 className={cn(
                   "rounded-md border-brand-surface bg-transparent hover:bg-brand-primary hover:text-white",
-                  selectedInterestIds.includes(topic.id) &&
+                  selectedInterestIds.includes(interest.id) &&
                     "border-brand-primary text-brand-primary border-1"
                 )}>
-                {topic.name}
+                <span className="text-sm">{interest.value}</span>
               </Button>
             ))}
           </div>
@@ -93,7 +104,13 @@ export function OnboardingStep2({ onNext, data }: StepProps) {
       <div className="pt-4">
         <Button
           onClick={handleSubmit}
-          className="w-full bg-brand-primary hover:bg-brand-primary/80 text-black font-bold text-lg py-6">
+          disabled={!isValid}
+          className={cn(
+            "w-full font-bold text-lg py-6",
+            isValid
+              ? "bg-brand-primary hover:bg-brand-primary/80 text-black"
+              : "bg-gray-400 text-gray-600 cursor-not-allowed"
+          )}>
           다음
         </Button>
       </div>

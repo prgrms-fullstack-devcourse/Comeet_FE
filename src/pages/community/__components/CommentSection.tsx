@@ -1,4 +1,4 @@
-import type { Comment } from "@/types/community";
+import type { Comment } from "@/types/community.types";
 import { CommentItem } from "./CommentItem";
 
 interface CommentSectionProps {

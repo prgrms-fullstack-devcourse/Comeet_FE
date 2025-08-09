@@ -1,4 +1,4 @@
-import type { Reply } from "@/types/community";
+import type { Reply } from "@/types/community.types";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 

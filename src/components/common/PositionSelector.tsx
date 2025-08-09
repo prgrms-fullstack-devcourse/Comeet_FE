@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion,
@@ -8,8 +7,8 @@ import {
 } from "@/components/ui/accordion";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { fetchPositions } from "@/lib/api";
-import type { PositionCategory } from "@/types/filter";
+import { usePositionsInterests } from "@/hooks/queries/useTags";
+import type { Position } from "@/types/tags.types";
 
 interface PositionSelectorProps {
   selectedPosition: number | null;
@@ -22,27 +21,26 @@ export const PositionSelector = ({
   onPositionChange,
   label = "포지션",
 }: PositionSelectorProps) => {
-  const [positions, setPositions] = useState<PositionCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadPositions = async () => {
-      try {
-        const fetchedPositions = await fetchPositions();
-        setPositions(fetchedPositions);
-      } catch (error) {
-        console.error("포지션 로딩 실패:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadPositions();
-  }, []);
+  const { data: positionsInterestsData, isLoading } = usePositionsInterests();
 
   if (isLoading) {
     return <div className="text-center">로딩 중...</div>;
   }
+
+  if (!positionsInterestsData?.positions) {
+    return <div className="text-center">포지션을 불러올 수 없습니다.</div>;
+  }
+
+  const positions = positionsInterestsData.positions;
+
+  // positions를 field별로 그룹화
+  const groupedPositions = positions.reduce((acc, position) => {
+    if (!acc[position.field]) {
+      acc[position.field] = [];
+    }
+    acc[position.field].push(position);
+    return acc;
+  }, {} as Record<string, Position[]>);
 
   return (
     <div className="space-y-3">
@@ -51,31 +49,28 @@ export const PositionSelector = ({
         type="single"
         collapsible
         className="w-full border rounded-md border-brand-surface">
-        {positions.map((cat) => (
+        {Object.entries(groupedPositions).map(([field, fieldPositions]) => (
           <AccordionItem
-            key={cat.category}
-            value={cat.category}
+            key={field}
+            value={field}
             className="px-4 border-b-brand-surface last:border-b-0">
             <AccordionTrigger className="hover:no-underline">
-              {cat.category}
+              {field}
             </AccordionTrigger>
             <AccordionContent>
               <div className="flex flex-col gap-2 pt-2">
-                {cat.positions.map((pos) => (
+                {fieldPositions.map((position) => (
                   <Button
-                    key={pos.id}
+                    key={position.id}
                     variant="outline"
-                    onClick={() => onPositionChange(pos.id)}
+                    onClick={() => onPositionChange(position.id)}
                     className={cn(
                       "h-auto justify-start text-left whitespace-normal border-transparent bg-brand-surface",
-                      selectedPosition === pos.id &&
+                      selectedPosition === position.id &&
                         "border-brand-primary text-brand-primary border-1"
                     )}>
                     <div className="flex flex-col">
-                      <span className="font-bold">{pos.name}</span>
-                      <span className="text-xs text-brand-text">
-                        {pos.description}
-                      </span>
+                      <span className="font-bold">{position.role}</span>
                     </div>
                   </Button>
                 ))}

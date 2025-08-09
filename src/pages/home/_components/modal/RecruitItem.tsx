@@ -11,26 +11,36 @@ import {
 import { ChevronsUpDown } from "lucide-react";
 import { PositionSelector } from "@/components/common/PositionSelector";
 import { StackSelector } from "@/components/common/StackSelector";
-import { useAddPostModal } from "../../../../hooks/useAddPostModal";
 
-export const RecruitItem = () => {
-  const {
-    title,
-    description,
-    recruitCount,
-    position,
-    selectedStackIds,
-    setTitle,
-    setDescription,
-    setRecruitCount,
-    setPosition,
-    setSelectedStackIds,
-  } = useAddPostModal();
+interface RecruitItemProps {
+  title: string;
+  description: string;
+  recruitCount: number;
+  position: number | null;
+  selectedStackIds: number[];
+  onTitleChange: (title: string) => void;
+  onDescriptionChange: (description: string) => void;
+  onRecruitCountChange: (count: number) => void;
+  onPositionChange: (position: number | null) => void;
+  onStackIdsChange: (stackIds: number[]) => void;
+}
 
+export const RecruitItem = ({
+  title,
+  description,
+  recruitCount,
+  position,
+  selectedStackIds,
+  onTitleChange,
+  onDescriptionChange,
+  onRecruitCountChange,
+  onPositionChange,
+  onStackIdsChange,
+}: RecruitItemProps) => {
   const [isRecruitPopoverOpen, setIsRecruitPopoverOpen] = useState(false);
 
   const handleRecruitCountSelect = (count: number) => {
-    setRecruitCount(count);
+    onRecruitCountChange(count);
     setIsRecruitPopoverOpen(false);
   };
 
@@ -40,12 +50,11 @@ export const RecruitItem = () => {
 
   return (
     <div className="space-y-6">
-      {/* 제목 입력 */}
       <div className="space-y-3">
         <Label>제목</Label>
         <Input
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => onTitleChange(e.target.value)}
           placeholder="제목을 입력하세요"
           className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary"
           maxLength={100}
@@ -54,13 +63,11 @@ export const RecruitItem = () => {
           {title.length}/100
         </div>
       </div>
-
-      {/* 설명 입력 */}
       <div className="space-y-3">
         <Label>설명</Label>
         <Textarea
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => onDescriptionChange(e.target.value)}
           placeholder="프로젝트/모각코에 대한 설명을 입력하세요"
           className="bg-brand-surface border-transparent focus:!ring-0 focus:!border-brand-primary resize-none min-h-[150px]"
           maxLength={2000}
@@ -69,8 +76,6 @@ export const RecruitItem = () => {
           {description.length}/2000
         </div>
       </div>
-
-      {/* 모집 인원 */}
       <div className="space-y-3">
         <Label>모집 인원</Label>
         <Popover
@@ -106,18 +111,14 @@ export const RecruitItem = () => {
           </PopoverContent>
         </Popover>
       </div>
-
-      {/* 포지션 선택 */}
       <PositionSelector
         selectedPosition={position}
-        onPositionChange={setPosition}
+        onPositionChange={onPositionChange}
         label="포지션"
       />
-
-      {/* 스택 선택 */}
       <StackSelector
         selectedStackIds={selectedStackIds}
-        onStackChange={setSelectedStackIds}
+        onStackChange={onStackIdsChange}
         label="기술 스택"
       />
     </div>

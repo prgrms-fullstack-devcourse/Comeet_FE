@@ -3,12 +3,12 @@ import { Settings2, LayoutGrid, List } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { FilteringModal } from "./_components/FilteringModal";
 import { EXPLORE_TABS, type ExploreTabValue } from "../../constants/explore";
-import type { Developer } from "../../types/developer";
+import type { Developer } from "../../types/developer.types";
 import { ListView } from "./_components/layout/ListView";
 import { GridView } from "./_components/layout/GridView";
 import { AppTabs } from "../../components/common/AppTabs";
 import { cn } from "../../lib/utils";
-import { fetchDevelopers } from "../../lib/api";
+import { fetchDevelopers } from "../../lib/api/developers";
 
 export const ExplorePage = () => {
   const [activeTab, setActiveTab] = useState<ExploreTabValue>("nearby");

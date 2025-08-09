@@ -19,7 +19,7 @@ export default function Header({
     "mx-2 text-white hover:bg-brand-surface hover:text-brand-primary cursor-pointer";
 
   return (
-    <header className="w-full border-b border-brand-surface flex items-center justify-between h-14 bg-brand-background">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-brand-surface flex items-center justify-between h-14 bg-brand-background">
       <div className="flex items-center w-10">
         {leftIcon && (
           <Button

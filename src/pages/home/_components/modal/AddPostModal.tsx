@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { ModalWrapper } from "@/components/common/ModalWrapper";
-import { BOARD_CATEGORIES } from "@/constants/board";
 import { PostItem } from "./PostItem";
 import { RecruitItem } from "./RecruitItem";
 import { useAddPostModal } from "../../../../hooks/useAddPostModal";
+import { useBoards } from "../../../../hooks/queries/usePosts";
 
 interface AddPostModalProps {
   onClose: () => void;
@@ -33,11 +33,46 @@ export const AddPostModal = ({
     position,
     selectedStackIds,
     isRecruitBoard,
+    setTitle,
+    setContent,
     setSelectedBoard,
+    setDescription,
+    setRecruitCount,
+    setPosition,
+    setSelectedStackIds,
     reset,
   } = useAddPostModal();
 
-  const handleSubmit = () => {};
+  const { data: boards = [] } = useBoards();
+
+  const handleSubmit = () => {
+    if (!title.trim() || !selectedBoard) {
+      return;
+    }
+
+    if (isRecruitBoard) {
+      if (!description.trim() || !position || selectedStackIds.length === 0) {
+        return;
+      }
+    } else {
+      if (!content.trim()) {
+        return;
+      }
+    }
+
+    const selectedBoardData = boards.find(
+      (board) => board.value === selectedBoard
+    );
+    if (!selectedBoardData) return;
+
+    const postData = {
+      title: title.trim(),
+      content: isRecruitBoard ? description.trim() : content.trim(),
+      boardId: selectedBoardData.id,
+    };
+
+    onSubmit(postData);
+  };
 
   const handleClose = () => {
     reset();
@@ -62,7 +97,7 @@ export const AddPostModal = ({
             ? !description.trim() || !position || selectedStackIds.length === 0
             : !content.trim())
         }
-        className="flex-1 bg-brand-primary   hover:bg-brand-primary/90 font-bold text-base py-6">
+        className="flex-1 bg-brand-primary hover:bg-brand-primary/90 font-bold text-base py-6">
         {isSubmitting ? "작성 중..." : "작성하기"}
       </Button>
     </div>
@@ -79,22 +114,40 @@ export const AddPostModal = ({
               <SelectValue placeholder="게시판을 선택하세요" />
             </SelectTrigger>
             <SelectContent className="bg-brand-surface border-transparent text-white">
-              {BOARD_CATEGORIES.filter((cat) => cat.value !== "all").map(
-                (category) => (
-                  <SelectItem
-                    key={category.value}
-                    value={category.value}
-                    className="text-white hover:bg-brand-primary/20 focus:bg-brand-primary">
-                    {category.label}
-                  </SelectItem>
-                )
-              )}
+              {boards.map((board) => (
+                <SelectItem
+                  key={board.id}
+                  value={board.value}
+                  className="text-white hover:bg-brand-primary/20 focus:bg-brand-primary">
+                  {board.value}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
         {/*포스트, 리크루트 조건부 렌더링*/}
-        {isRecruitBoard ? <RecruitItem /> : <PostItem />}
+        {isRecruitBoard ? (
+          <RecruitItem
+            title={title}
+            description={description}
+            recruitCount={recruitCount}
+            position={position}
+            selectedStackIds={selectedStackIds}
+            onTitleChange={setTitle}
+            onDescriptionChange={setDescription}
+            onRecruitCountChange={setRecruitCount}
+            onPositionChange={setPosition}
+            onStackIdsChange={setSelectedStackIds}
+          />
+        ) : (
+          <PostItem
+            title={title}
+            content={content}
+            onTitleChange={setTitle}
+            onContentChange={setContent}
+          />
+        )}
       </div>
     </ModalWrapper>
   );

@@ -1,4 +1,4 @@
-import type { Developer } from "@/types/developer";
+import type { Developer } from "@/types/developer.types";
 import { DeveloperProfileCard } from "../DeveloperProfileCard";
 
 interface ListViewProps {

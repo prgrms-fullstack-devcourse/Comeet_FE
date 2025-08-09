@@ -26,7 +26,7 @@ export const useAddPostModal = (): AddPostModalState &
   const [state, setState] = useState<AddPostModalState>({
     title: "",
     content: "",
-    selectedBoard: "1",
+    selectedBoard: "자유",
     description: "",
     recruitCount: 1,
     position: null,
@@ -65,7 +65,7 @@ export const useAddPostModal = (): AddPostModalState &
     setState({
       title: "",
       content: "",
-      selectedBoard: "1",
+      selectedBoard: "자유",
       description: "",
       recruitCount: 1,
       position: null,
@@ -74,7 +74,7 @@ export const useAddPostModal = (): AddPostModalState &
   }, []);
 
   const isRecruitBoard =
-    state.selectedBoard === "3" || state.selectedBoard === "4";
+    state.selectedBoard === "모각코" || state.selectedBoard === "프로젝트";
 
   return {
     ...state,
