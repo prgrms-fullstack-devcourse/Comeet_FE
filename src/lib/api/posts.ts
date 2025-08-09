@@ -96,27 +96,6 @@ export const fetchComments = async (postId: string): Promise<Comment[]> => {
   return data.results || [];
 };
 
-// 댓글 생성
-export const createComment = async (
-  postId: string,
-  content: string
-): Promise<{ nComments: number }> => {
-  const response = await fetch(`${createApiUrl(`/posts/${postId}`)}`, {
-    method: "POST",
-    headers: createAuthHeaders(),
-    body: JSON.stringify({
-      content,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error("댓글 작성에 실패했습니다.");
-  }
-
-  const data = await response.json();
-  return data;
-};
-
 // 게시글 검색
 export const searchPosts = async (query: string): Promise<Post[]> => {
   const response = await fetch(
