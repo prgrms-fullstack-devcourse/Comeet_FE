@@ -76,9 +76,6 @@ export const fetchPostDetail = async (postId: string): Promise<Post> => {
   }
 
   const data = await response.json();
-  console.log("🔍 fetchPostDetail API Response:", data);
-
-  // API는 게시글 데이터를 직접 반환
   return data;
 };
 
