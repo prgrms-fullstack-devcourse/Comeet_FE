@@ -1,8 +1,8 @@
-import type { Comment } from "@/types/community.types";
+import type { CommentResponse } from "@/types/post.types";
 import { formatCommentDate } from "@/lib/date";
 
 interface CommentItemProps {
-  comment: Comment;
+  comment: CommentResponse;
 }
 
 export function CommentItem({ comment }: CommentItemProps) {

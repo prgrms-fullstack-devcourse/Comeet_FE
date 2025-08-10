@@ -3,7 +3,14 @@ import Header from "@/components/layout/Header";
 import { ArrowLeft, Bookmark, Heart, MessageCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { usePostDetail, useComments } from "@/hooks/queries/usePosts";
+import { Button } from "@/components/ui/button";
+import {
+  usePostDetail,
+  useComments,
+  useToggleLike,
+  useToggleBookmark,
+  useCreateComment,
+} from "@/hooks/queries/usePosts";
 import { CommentForm } from "./__components/CommentForm";
 import { CommentSection } from "./__components/CommentSection";
 import { formatPostDetailDate } from "@/lib/date";
@@ -23,6 +30,10 @@ export function PostDetailPage() {
     isError: isCommentsError,
   } = useComments(postId);
 
+  const toggleLikeMutation = useToggleLike();
+  const toggleBookmarkMutation = useToggleBookmark();
+  const createCommentMutation = useCreateComment();
+
   if (isLoading) {
     return <div className="p-4 text-white">로딩 중...</div>;
   }
@@ -37,8 +48,32 @@ export function PostDetailPage() {
     navigate(-1);
   };
 
-  const handleBookmarkClick = () => {
-    console.log("북마크 클릭");
+  const handleLikeClick = async () => {
+    if (!post) return;
+    try {
+      await toggleLikeMutation.mutateAsync(post.id);
+    } catch (error) {
+      console.error("좋아요 처리 실패:", error);
+    }
+  };
+
+  const handleBookmarkClick = async () => {
+    if (!post) return;
+    try {
+      await toggleBookmarkMutation.mutateAsync(post.id);
+    } catch (error) {
+      console.error("북마크 처리 실패:", error);
+    }
+  };
+
+  const handleCommentSubmit = async (content: string) => {
+    if (!postId) return;
+    try {
+      await createCommentMutation.mutateAsync({ postId, content });
+    } catch (error) {
+      console.error("댓글 작성 실패:", error);
+      alert("댓글 작성에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -46,7 +81,13 @@ export function PostDetailPage() {
       <Header
         title="COMEET"
         leftIcon={<ArrowLeft />}
-        rightIcon={<Bookmark />}
+        rightIcon={
+          <Bookmark
+            className={
+              post.bookmark ? "fill-brand-primary text-brand-primary" : ""
+            }
+          />
+        }
         onLeftClick={handleBackClick}
         onRightClick={handleBookmarkClick}
       />
@@ -73,17 +114,24 @@ export function PostDetailPage() {
               {post.content ? (
                 <>{post.content}</>
               ) : (
-                <p className="text-brand-text">
-                  게시글 내용은 현재 API에서 제공되지 않습니다.
-                </p>
+                <p className="text-brand-text">게시글 내용이 없습니다.</p>
               )}
             </div>
 
-            <div className="flex items-center gap-x-6 text-brand-text">
-              <div className="flex items-center gap-x-2">
-                <Heart className="size-4" />
+            <div className="flex items-center gap-x-3 text-brand-text">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-0 h-auto flex items-center gap-x-2"
+                onClick={handleLikeClick}
+                disabled={toggleLikeMutation.isPending}>
+                <Heart
+                  className="size-4"
+                  fill={post.likeIt ? "#FF4A4A" : "none"}
+                  stroke={post.likeIt ? "#FF4A4A" : "currentColor"}
+                />
                 <span>{post.nLikes}</span>
-              </div>
+              </Button>
               <div className="flex items-center gap-x-2">
                 <MessageCircle className="size-4" />
                 <span>{post.nComments}</span>
@@ -101,18 +149,16 @@ export function PostDetailPage() {
               댓글을 불러오는 데 실패했습니다.
             </div>
           ) : (
-            <CommentSection
-              comments={comments}
-              onToggleCommentLike={() => {}}
-              onToggleReplyLike={() => {}}
-            />
+            <CommentSection comments={comments} />
           )}
-          <div className="h-20"></div>
         </main>
       </div>
 
       <div className="border-t border-brand-surface bg-brand-background">
-        <CommentForm onSubmit={() => {}} isPending={false} />
+        <CommentForm
+          onSubmit={handleCommentSubmit}
+          isPending={createCommentMutation.isPending}
+        />
       </div>
     </div>
   );

@@ -6,10 +6,16 @@ import {
   fetchPostDetail,
   searchPosts,
   fetchComments,
+  createComment,
+  toggleLike,
+  toggleBookmark,
 } from "@/lib/api/posts";
 import type { UICategory } from "@/constants/board";
-import type { Post } from "@/types/post.types";
-import type { Comment } from "@/types/community.types";
+import type {
+  CommentResponse,
+  PostDetailResponse,
+  PostCommentResponse,
+} from "@/types/post.types";
 
 export const useBoards = () => {
   return useQuery({
@@ -30,7 +36,7 @@ export const usePosts = (category: UICategory) => {
 };
 
 export const usePostDetail = (postId: string) => {
-  return useQuery<Post>({
+  return useQuery<PostDetailResponse>({
     queryKey: ["post", postId],
     queryFn: async () => {
       const result = await fetchPostDetail(postId);
@@ -68,11 +74,81 @@ export const useCreatePost = () => {
 };
 
 export const useComments = (postId: string) => {
-  return useQuery<Comment[]>({
+  return useQuery<CommentResponse[]>({
     queryKey: ["comments", postId],
     queryFn: () => fetchComments(postId),
     enabled: !!postId,
     staleTime: 2 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
+  });
+};
+
+export const useToggleLike = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: toggleLike,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["search"] });
+      queryClient.setQueryData<PostDetailResponse>(
+        ["post", variables.toString()],
+        (oldData: PostDetailResponse | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            nLikes: data.nLikes,
+            likeIt: data.likeIt,
+          };
+        }
+      );
+    },
+  });
+};
+
+export const useToggleBookmark = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: toggleBookmark,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["search"] });
+      queryClient.setQueryData<PostDetailResponse>(
+        ["post", variables.toString()],
+        (oldData: PostDetailResponse | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            bookmark: data.bookmark,
+          };
+        }
+      );
+    },
+  });
+};
+
+export const useCreateComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ postId, content }: { postId: string; content: string }) =>
+      createComment(postId, content),
+    onSuccess: (data: PostCommentResponse, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", variables.postId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.setQueryData<PostDetailResponse>(
+        ["post", variables.postId],
+        (oldData: PostDetailResponse | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            nComments: data.nComments,
+          };
+        }
+      );
+    },
   });
 };
