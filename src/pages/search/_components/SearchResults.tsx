@@ -2,11 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle } from "lucide-react";
-import type { Post } from "@/types/post.types";
+import type { PostListItem } from "@/types/post.types";
 import { formatPostListDate } from "@/lib/date";
 
 interface SearchResultsProps {
-  posts: Post[];
+  posts: PostListItem[];
   isLoading: boolean;
   isError: boolean;
   error: Error | null;
@@ -24,7 +24,7 @@ export default function SearchResults({
 }: SearchResultsProps) {
   const navigate = useNavigate();
 
-  const handlePostClick = (post: Post) => {
+  const handlePostClick = (post: PostListItem) => {
     navigate(`/community/${post.id}`);
   };
 
