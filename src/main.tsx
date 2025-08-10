@@ -7,6 +7,7 @@ import App from "./App.tsx";
 import { LoginPage } from "./pages/auth/LoginPage.tsx";
 import { BoardPage } from "./pages/home/index.tsx";
 import { MyPage } from "./pages/my/index.tsx";
+import { EditProfilePage } from "./pages/my/edit/index.tsx";
 import { DeveloperPage } from "./pages/developer/index.tsx";
 import { ExplorePage } from "./pages/explore/index.tsx";
 import { OnboardingPage } from "./pages/onboarding/index.tsx";
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: "my",
         element: <MyPage />,
+      },
+      {
+        path: "my/edit",
+        element: <EditProfilePage />,
       },
       {
         path: "developer/:id",
