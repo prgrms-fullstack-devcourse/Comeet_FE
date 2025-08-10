@@ -3,9 +3,15 @@ import { CommentItem } from "./CommentItem";
 
 interface CommentSectionProps {
   comments: CommentResponse[];
+  onEditComment?: (commentId: number) => void;
+  onDeleteComment?: (commentId: number) => void;
 }
 
-export function CommentSection({ comments }: CommentSectionProps) {
+export function CommentSection({
+  comments,
+  onEditComment,
+  onDeleteComment,
+}: CommentSectionProps) {
   const totalComments = comments.length;
 
   return (
@@ -17,7 +23,12 @@ export function CommentSection({ comments }: CommentSectionProps) {
           .slice()
           .reverse()
           .map((comment) => (
-            <CommentItem key={comment.id} comment={comment} />
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              onEditClick={() => onEditComment?.(comment.id)}
+              onDeleteClick={() => onDeleteComment?.(comment.id)}
+            />
           ))}
       </div>
     </div>

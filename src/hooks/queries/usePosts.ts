@@ -9,12 +9,20 @@ import {
   createComment,
   toggleLike,
   toggleBookmark,
+  fetchApplicants,
+  toggleApply,
+  deletePost,
+  updateComment,
+  deleteComment,
 } from "@/lib/api/posts";
 import type { UICategory } from "@/constants/board";
 import type {
   CommentResponse,
   PostDetailResponse,
+  PostListItem,
+  PostDetailItem,
   PostCommentResponse,
+  ApplicantResponse,
 } from "@/types/post.types";
 
 export const useBoards = () => {
@@ -27,16 +35,22 @@ export const useBoards = () => {
 };
 
 export const usePosts = (category: UICategory) => {
-  return useQuery({
+  return useQuery<PostListItem[]>({
     queryKey: ["posts", category],
-    queryFn: () => fetchPosts(category),
+    queryFn: async () => {
+      const posts = await fetchPosts(category);
+      return posts.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 };
 
 export const usePostDetail = (postId: string) => {
-  return useQuery<PostDetailResponse>({
+  return useQuery<PostDetailItem>({
     queryKey: ["post", postId],
     queryFn: async () => {
       const result = await fetchPostDetail(postId);
@@ -55,7 +69,13 @@ export const usePostDetail = (postId: string) => {
 export const useSearchPosts = (query: string) => {
   return useQuery({
     queryKey: ["search", query],
-    queryFn: () => searchPosts(query),
+    queryFn: async () => {
+      const posts = await searchPosts(query);
+      return posts.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    },
     enabled: !!query && query.trim().length > 0,
     staleTime: 2 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
@@ -146,6 +166,128 @@ export const useCreateComment = () => {
           return {
             ...oldData,
             nComments: data.nComments,
+          };
+        }
+      );
+    },
+  });
+};
+
+export const useApplicants = (postId: string) => {
+  return useQuery<ApplicantResponse[]>({
+    queryKey: ["applicants", postId],
+    queryFn: () => fetchApplicants(postId),
+    enabled: !!postId,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+};
+
+export const useToggleApply = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: toggleApply,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({
+        queryKey: ["applicants", variables.toString()],
+      });
+
+      queryClient.setQueryData<PostDetailItem>(
+        ["post", variables.toString()],
+        (oldData: PostDetailItem | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            applied: data.applied,
+            nApplicants: data.applied
+              ? (oldData.nApplicants || 0) + 1
+              : Math.max((oldData.nApplicants || 0) - 1, 0),
+          };
+        }
+      );
+
+      queryClient.setQueriesData<PostListItem[]>(
+        { queryKey: ["posts"] },
+        (oldData: PostListItem[] | undefined) => {
+          if (!oldData) return oldData;
+          return oldData.map((post) => {
+            if (post.id === variables) {
+              return {
+                ...post,
+                nApplicants: data.applied
+                  ? (post.nApplicants || 0) + 1
+                  : Math.max((post.nApplicants || 0) - 1, 0),
+              };
+            }
+            return post;
+          });
+        }
+      );
+    },
+  });
+};
+
+export const useDeletePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deletePost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["search"] });
+    },
+  });
+};
+
+export const useUpdateComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      commentId,
+      content,
+    }: {
+      commentId: number;
+      content: string;
+    }) => updateComment(commentId, { content }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
+      queryClient.setQueriesData<CommentResponse[]>(
+        { queryKey: ["comments"] },
+        (oldData: CommentResponse[] | undefined) => {
+          if (!oldData) return oldData;
+          return oldData.map((comment) => {
+            if (comment.id === variables.commentId) {
+              return {
+                ...comment,
+                content: variables.content,
+              };
+            }
+            return comment;
+          });
+        }
+      );
+    },
+  });
+};
+
+export const useDeleteComment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.setQueriesData<PostDetailItem>(
+        { queryKey: ["post"] },
+        (oldData: PostDetailItem | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            nComments: Math.max((oldData.nComments || 0) - 1, 0),
           };
         }
       );

@@ -5,6 +5,10 @@ import type {
   LikeToggleResponse,
   BookmarkToggleResponse,
   PostCommentResponse,
+  ApplicantResponse,
+  ApplyToggleResponse,
+  UpdatePostRequest,
+  UpdateCommentRequest,
 } from "@/types/post.types";
 import type { UICategory } from "@/constants/board";
 import { createApiUrl, createAuthHeaders } from "./config";
@@ -28,7 +32,7 @@ export const fetchBoards = async (): Promise<Board[]> => {
   return data.results || [];
 };
 
-//게시글 목록 조회회
+//게시글 목록 조회
 export const fetchPosts = async (
   category: UICategory
 ): Promise<PostDetailResponse[]> => {
@@ -51,7 +55,7 @@ export const fetchPosts = async (
 
 //게시글 생성
 export const createPost = async (data: CreatePostRequest): Promise<void> => {
-  const response = await fetch(`${createApiUrl(`/posts`)}`, {
+  const response = await fetch(`${createApiUrl(`/posts/${data.boardId}`)}`, {
     method: "POST",
     headers: createAuthHeaders(),
     body: JSON.stringify({
@@ -129,7 +133,7 @@ export const searchPosts = async (
   query: string
 ): Promise<PostDetailResponse[]> => {
   const response = await fetch(
-    `${createApiUrl(`/posts/search?query=${encodeURIComponent(query)}`)}`,
+    `${createApiUrl(`/posts/search?keyword=${encodeURIComponent(query)}`)}`,
     {
       headers: createAuthHeaders(),
     }
@@ -176,4 +180,101 @@ export const toggleBookmark = async (
   }
 
   return response.json();
+};
+
+// 지원자 목록 조회
+export const fetchApplicants = async (
+  postId: string
+): Promise<ApplicantResponse[]> => {
+  const response = await fetch(
+    `${createApiUrl(`/posts/${postId}/applicants`)}`,
+    {
+      headers: createAuthHeaders(),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("지원자 목록을 불러오는 데 실패했습니다.");
+  }
+
+  const data = await response.json();
+  return data.results || [];
+};
+
+// 지원 상태 반전
+export const toggleApply = async (
+  postId: number
+): Promise<ApplyToggleResponse> => {
+  const response = await fetch(`${createApiUrl(`/posts/${postId}/applies`)}`, {
+    method: "PUT",
+    headers: createAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error("지원 처리에 실패했습니다.");
+  }
+
+  return response.json();
+};
+
+// // 게시글 수정
+// export const updatePost = async (
+//   postId: number,
+//   data: UpdatePostRequest
+// ): Promise<void> => {
+//   const response = await fetch(`${createApiUrl(`/posts/posts/${postId}`)}`, {
+//     method: "PATCH",
+//     headers: createAuthHeaders(),
+//     body: JSON.stringify(data),
+//   });
+
+//   if (!response.ok) {
+//     throw new Error("게시글 수정에 실패했습니다.");
+//   }
+// };
+
+// 게시글 삭제
+export const deletePost = async (postId: number): Promise<void> => {
+  const response = await fetch(`${createApiUrl(`/posts/posts/${postId}`)}`, {
+    method: "DELETE",
+    headers: createAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error("게시글 삭제에 실패했습니다.");
+  }
+};
+
+// 댓글 수정
+export const updateComment = async (
+  commentId: number,
+  data: UpdateCommentRequest
+): Promise<void> => {
+  const response = await fetch(
+    `${createApiUrl(`/posts/comments/${commentId}`)}`,
+    {
+      method: "PATCH",
+      headers: createAuthHeaders(),
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("댓글 수정에 실패했습니다.");
+  }
+};
+
+// 댓글 삭제
+export const deleteComment = async (commentId: number): Promise<void> => {
+  const response = await fetch(
+    `${createApiUrl(`/posts/comments/${commentId}`)}`,
+    {
+      method: "DELETE",
+      headers: createAuthHeaders(),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("댓글 삭제에 실패했습니다.");
+  }
 };

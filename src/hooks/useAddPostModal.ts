@@ -7,7 +7,9 @@ interface AddPostModalState {
   description: string;
   recruitCount: number;
   position: number | null;
+  selectedPositionIds: number[];
   selectedStackIds: number[];
+  location: { lat: number; lng: number } | null;
 }
 
 interface AddPostModalActions {
@@ -17,7 +19,9 @@ interface AddPostModalActions {
   setDescription: (description: string) => void;
   setRecruitCount: (count: number) => void;
   setPosition: (position: number | null) => void;
+  setSelectedPositionIds: (positionIds: number[]) => void;
   setSelectedStackIds: (stackIds: number[]) => void;
+  setLocation: (location: { lat: number; lng: number } | null) => void;
   reset: () => void;
 }
 
@@ -30,7 +34,9 @@ export const useAddPostModal = (): AddPostModalState &
     description: "",
     recruitCount: 1,
     position: null,
+    selectedPositionIds: [],
     selectedStackIds: [],
+    location: null,
   });
 
   const setTitle = useCallback((title: string) => {
@@ -57,9 +63,23 @@ export const useAddPostModal = (): AddPostModalState &
     setState((prev) => ({ ...prev, position }));
   }, []);
 
+  const setSelectedPositionIds = useCallback(
+    (selectedPositionIds: number[]) => {
+      setState((prev) => ({ ...prev, selectedPositionIds }));
+    },
+    []
+  );
+
   const setSelectedStackIds = useCallback((selectedStackIds: number[]) => {
     setState((prev) => ({ ...prev, selectedStackIds }));
   }, []);
+
+  const setLocation = useCallback(
+    (location: { lat: number; lng: number } | null) => {
+      setState((prev) => ({ ...prev, location }));
+    },
+    []
+  );
 
   const reset = useCallback(() => {
     setState({
@@ -69,7 +89,9 @@ export const useAddPostModal = (): AddPostModalState &
       description: "",
       recruitCount: 1,
       position: null,
+      selectedPositionIds: [],
       selectedStackIds: [],
+      location: null,
     });
   }, []);
 
@@ -84,7 +106,9 @@ export const useAddPostModal = (): AddPostModalState &
     setDescription,
     setRecruitCount,
     setPosition,
+    setSelectedPositionIds,
     setSelectedStackIds,
+    setLocation,
     reset,
     isRecruitBoard,
   };

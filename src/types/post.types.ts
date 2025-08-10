@@ -36,6 +36,15 @@ export interface PostDetailResponse {
   bookmark: boolean;
 }
 
+export interface PostListItem extends PostListResponse {
+  nApplicants?: number;
+}
+
+export interface PostDetailItem extends PostDetailResponse {
+  nApplicants?: number;
+  applied?: boolean;
+}
+
 export interface CommentResponse {
   id: number;
   postId: number;
@@ -61,12 +70,10 @@ export interface PostCommentResponse {
   nComments: number;
 }
 
-// ===== Request Types =====
-
-// 게시글 생성 요청
 export interface CreatePostRequest {
   title: string;
   content: string;
+  boardId: number;
   location: {
     lng: number;
     lat: number;
@@ -75,4 +82,22 @@ export interface CreatePostRequest {
 
 export interface CreateCommentRequest {
   content: string;
+}
+
+export interface UpdatePostRequest {
+  title: string;
+  content: string;
+}
+
+export interface UpdateCommentRequest {
+  content: string;
+}
+
+export interface ApplicantResponse {
+  nickname: string;
+  avatar: string;
+}
+
+export interface ApplyToggleResponse {
+  applied: boolean;
 }
