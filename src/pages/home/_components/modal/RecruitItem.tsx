@@ -17,11 +17,14 @@ interface RecruitItemProps {
   description: string;
   recruitCount: number;
   position: number | null;
+  selectedPositionIds: number[];
   selectedStackIds: number[];
+  boardValue: string;
   onTitleChange: (title: string) => void;
   onDescriptionChange: (description: string) => void;
   onRecruitCountChange: (count: number) => void;
   onPositionChange: (position: number | null) => void;
+  onPositionIdsChange: (positionIds: number[]) => void;
   onStackIdsChange: (stackIds: number[]) => void;
 }
 
@@ -30,11 +33,14 @@ export const RecruitItem = ({
   description,
   recruitCount,
   position,
+  selectedPositionIds,
   selectedStackIds,
+  boardValue,
   onTitleChange,
   onDescriptionChange,
   onRecruitCountChange,
   onPositionChange,
+  onPositionIdsChange,
   onStackIdsChange,
 }: RecruitItemProps) => {
   const [isRecruitPopoverOpen, setIsRecruitPopoverOpen] = useState(false);
@@ -111,11 +117,17 @@ export const RecruitItem = ({
           </PopoverContent>
         </Popover>
       </div>
-      <PositionSelector
-        selectedPosition={position}
-        onPositionChange={onPositionChange}
-        label="포지션"
-      />
+      {/* 모각코에서는 포지션 제외, 프로젝트에서는 포지션 다중 선택 가능 */}
+      {boardValue === "프로젝트" && (
+        <PositionSelector
+          selectedPosition={position}
+          selectedPositionIds={selectedPositionIds}
+          onPositionChange={onPositionChange}
+          onPositionIdsChange={onPositionIdsChange}
+          label="포지션"
+          multiple={true}
+        />
+      )}
       <StackSelector
         selectedStackIds={selectedStackIds}
         onStackChange={onStackIdsChange}
