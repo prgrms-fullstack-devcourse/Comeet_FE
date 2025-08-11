@@ -5,7 +5,7 @@ export const DEVELOPER_TABS = [
   },
   {
     value: "posts",
-    label: "작성한 글 ",
+    label: "소셜 링크",
   },
 ] as const;
 
