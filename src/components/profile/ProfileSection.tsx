@@ -38,6 +38,9 @@ export const ProfileSection = ({
       </div>
       <h2 className="text-2xl font-bold mt-4 text-white">{displayName}</h2>
       <p className="text-brand-text mt-1">{displayInfo}</p>
+      <p className="text-brand-text text-sm mt-1">
+        구독자 {profile?.nSubscribers || 0}명
+      </p>
       <Button
         variant="outline"
         onClick={onEditClick}
