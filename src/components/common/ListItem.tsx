@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { Post } from "@/types/post.types";
+import type { PostListItem } from "@/types/post.types";
+import { formatPostListDate } from "@/lib/date";
 
 interface ListItemProps {
-  post: Post;
+  post: PostListItem;
 }
 
 export const ListItem = ({ post }: ListItemProps) => {
@@ -13,14 +14,6 @@ export const ListItem = ({ post }: ListItemProps) => {
 
   const handleClick = () => {
     navigate(`/community/${post.id}`);
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("ko-KR", {
-      month: "short",
-      day: "numeric",
-    });
   };
 
   return (
@@ -35,17 +28,27 @@ export const ListItem = ({ post }: ListItemProps) => {
       </CardHeader>
       <CardContent className="flex justify-between items-center text-xs text-brand-text">
         <span>
-          {post.author.nickname} · {formatDate(post.createdAt)}
+          {post.author.nickname} · {formatPostListDate(post.createdAt)}
         </span>
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1">
             <Heart className="size-4" aria-label="좋아요" />
             <span className="w-3">{post.nLikes}</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <MessageCircle className="size-4" aria-label="댓글" />
-            <span className="w-3">{post.nComments}</span>
-          </div>
+          {/* 일반 게시판: 댓글 개수 표시 */}
+          {!post.board.isRecruit && (
+            <div className="flex items-center space-x-1">
+              <MessageCircle className="size-4" aria-label="댓글" />
+              <span className="w-3">{post.nComments}</span>
+            </div>
+          )}
+          {/* 모집 게시판: 지원자 개수 표시. api에 관련 필드 없는 관계로 쿼리로 처리 중--개선 필요*/}
+          {post.board.isRecruit && (
+            <div className="flex items-center space-x-1">
+              <Users className="size-4" aria-label="지원자" />
+              <span className="w-3">{post.nApplicants || 0}</span>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

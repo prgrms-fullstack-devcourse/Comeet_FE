@@ -12,14 +12,20 @@ import type { Position } from "@/types/tags.types";
 
 interface PositionSelectorProps {
   selectedPosition: number | null;
+  selectedPositionIds?: number[];
   onPositionChange: (positionId: number) => void;
+  onPositionIdsChange?: (positionIds: number[]) => void;
   label?: string;
+  multiple?: boolean;
 }
 
 export const PositionSelector = ({
   selectedPosition,
+  selectedPositionIds = [],
   onPositionChange,
+  onPositionIdsChange,
   label = "포지션",
+  multiple = false,
 }: PositionSelectorProps) => {
   const { data: positionsInterestsData, isLoading } = usePositionsInterests();
 
@@ -59,21 +65,38 @@ export const PositionSelector = ({
             </AccordionTrigger>
             <AccordionContent>
               <div className="flex flex-col gap-2 pt-2">
-                {fieldPositions.map((position) => (
-                  <Button
-                    key={position.id}
-                    variant="outline"
-                    onClick={() => onPositionChange(position.id)}
-                    className={cn(
-                      "h-auto justify-start text-left whitespace-normal border-transparent bg-brand-surface",
-                      selectedPosition === position.id &&
-                        "border-brand-primary text-brand-primary border-1"
-                    )}>
-                    <div className="flex flex-col">
-                      <span className="font-bold">{position.role}</span>
-                    </div>
-                  </Button>
-                ))}
+                {fieldPositions.map((position) => {
+                  const isSelected = multiple
+                    ? selectedPositionIds.includes(position.id)
+                    : selectedPosition === position.id;
+
+                  const handleClick = () => {
+                    if (multiple && onPositionIdsChange) {
+                      const newPositionIds = isSelected
+                        ? selectedPositionIds.filter((id) => id !== position.id)
+                        : [...selectedPositionIds, position.id];
+                      onPositionIdsChange(newPositionIds);
+                    } else {
+                      onPositionChange(position.id);
+                    }
+                  };
+
+                  return (
+                    <Button
+                      key={position.id}
+                      variant="outline"
+                      onClick={handleClick}
+                      className={cn(
+                        "h-auto justify-start text-left whitespace-normal border-transparent bg-brand-surface",
+                        isSelected &&
+                          "border-brand-primary text-brand-primary border-1"
+                      )}>
+                      <div className="flex flex-col">
+                        <span className="font-bold">{position.role}</span>
+                      </div>
+                    </Button>
+                  );
+                })}
               </div>
             </AccordionContent>
           </AccordionItem>

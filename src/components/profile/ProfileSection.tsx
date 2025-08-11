@@ -1,71 +1,52 @@
-import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera } from "lucide-react";
+import type { GetProfileResponse } from "@/types/my.types";
 
 interface ProfileSectionProps {
+  profile?: GetProfileResponse;
   isEditable?: boolean;
+  onEditClick?: () => void;
 }
 
-export const ProfileSection = ({ isEditable = false }: ProfileSectionProps) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-
-  const handleImageClick = () => {
-    if (!isEditable) return;
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
-        if (typeof reader.result === "string") {
-          setImagePreview(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+export const ProfileSection = ({
+  profile,
+  onEditClick,
+}: ProfileSectionProps) => {
+  const displayImage = profile?.avatar;
+  const displayName = profile?.nickname || "이름";
+  const displayInfo = profile
+    ? `${profile.age}세 · ${profile.position?.role || "포지션"}`
+    : "나이 · 포지션";
 
   return (
     <div className="flex flex-col items-center mt-8">
       <div className="relative">
-        <div
-          className={`w-32 h-32 rounded-full bg-brand-primary flex items-center justify-center overflow-hidden ${
-            isEditable ? "cursor-pointer" : ""
-          }`}
-          onClick={handleImageClick}>
-          {imagePreview ? (
+        <div className="w-32 h-32 rounded-full bg-brand-primary flex items-center justify-center overflow-hidden">
+          {displayImage ? (
             <img
-              src={imagePreview}
-              alt="Profile preview"
+              src={displayImage}
+              alt="Profile"
               className="w-full h-full object-cover"
             />
           ) : (
-            isEditable && <Camera className="size-12 text-brand-background" />
+            <div className="w-full h-full bg-brand-primary flex items-center justify-center">
+              <span className="text-brand-background text-2xl font-bold">
+                {displayName.charAt(0)}
+              </span>
+            </div>
           )}
         </div>
-        {isEditable && (
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
-            accept="image/*"
-          />
-        )}
       </div>
-      <h2 className="text-2xl font-bold mt-4 text-white">이름</h2>
-      <p className="text-brand-text mt-1">나이 · 포지션</p>
-      {isEditable && (
-        <Button
-          variant="outline"
-          className="mt-4 bg-transparent border-brand-surface text-white hover:bg-brand-surface/50 hover:text-white">
-          프로필 설정
-        </Button>
-      )}
+      <h2 className="text-2xl font-bold mt-4 text-white">{displayName}</h2>
+      <p className="text-brand-text mt-1">{displayInfo}</p>
+      <p className="text-brand-text text-sm mt-1">
+        구독자 {profile?.nSubscribers || 0}명
+      </p>
+      <Button
+        variant="outline"
+        onClick={onEditClick}
+        className="mt-4 bg-transparent border-brand-surface text-white hover:bg-brand-surface/50 hover:text-white">
+        프로필 설정
+      </Button>
     </div>
   );
 };

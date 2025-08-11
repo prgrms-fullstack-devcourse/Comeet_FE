@@ -1,16 +1,16 @@
-import type { Comment } from "@/types/community.types";
+import type { CommentResponse } from "@/types/post.types";
 import { CommentItem } from "./CommentItem";
 
 interface CommentSectionProps {
-  comments: Comment[];
-  onToggleCommentLike: (commentId: number) => void;
-  onToggleReplyLike: (replyId: number) => void;
+  comments: CommentResponse[];
+  onEditComment?: (commentId: number) => void;
+  onDeleteComment?: (commentId: number) => void;
 }
 
 export function CommentSection({
   comments,
-  onToggleCommentLike,
-  onToggleReplyLike,
+  onEditComment,
+  onDeleteComment,
 }: CommentSectionProps) {
   const totalComments = comments.length;
 
@@ -19,14 +19,17 @@ export function CommentSection({
       <h3 className="text-sm font-semibold">댓글 {totalComments}</h3>
 
       <div className="flex flex-col">
-        {comments.map((comment) => (
-          <CommentItem
-            key={comment.id}
-            comment={comment}
-            onToggleLike={onToggleCommentLike}
-            onToggleReplyLike={onToggleReplyLike}
-          />
-        ))}
+        {comments
+          .slice()
+          .reverse()
+          .map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              onEditClick={() => onEditComment?.(comment.id)}
+              onDeleteClick={() => onDeleteComment?.(comment.id)}
+            />
+          ))}
       </div>
     </div>
   );

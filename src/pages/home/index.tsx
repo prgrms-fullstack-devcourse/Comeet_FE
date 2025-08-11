@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Bell, Plus, Search } from "lucide-react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usePosts, useCreatePost, useBoards } from "@/hooks/queries/usePosts";
+import { useLocationQuery } from "@/hooks/queries/useLocationQuery";
 import { AppTabs } from "@/components/common/AppTabs";
 import { AddPostModal } from "./_components/modal/AddPostModal";
-import { ListItem } from "./_components/ListItem";
+import { ListItem } from "@/components/common/ListItem";
 import type { UICategory } from "@/constants/board";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
@@ -15,6 +16,7 @@ export const BoardPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: boards = [], isLoading: boardsLoading } = useBoards();
+  const { refetchLocation } = useLocationQuery();
 
   const validCategories = [
     "all",
@@ -50,7 +52,12 @@ export const BoardPage = () => {
     navigate("/search");
   };
 
-  const handlePlusClick = () => {
+  const handlePlusClick = async () => {
+    try {
+      await refetchLocation();
+    } catch (error) {
+      console.error("위치 정보 가져오기 실패:", error);
+    }
     setIsModalOpen(true);
   };
 
@@ -58,12 +65,12 @@ export const BoardPage = () => {
     title: string;
     content: string;
     boardId: number;
+    location: { lat: number; lng: number };
   }) => {
     try {
       await createPostMutation.mutateAsync(data);
       setIsModalOpen(false);
     } catch (err) {
-      console.error("게시글 작성 실패:", err);
       alert("게시글 작성에 실패했습니다.");
     }
   };

@@ -7,10 +7,15 @@ import App from "./App.tsx";
 import { LoginPage } from "./pages/auth/LoginPage.tsx";
 import { BoardPage } from "./pages/home/index.tsx";
 import { MyPage } from "./pages/my/index.tsx";
+import { EditProfilePage } from "./pages/my/edit/index.tsx";
+import { MyPostsPage } from "./pages/my/posts.tsx";
+import { MyHistoryPage } from "./pages/my/history.tsx";
+import { MyCommentsPage } from "./pages/my/comments.tsx";
+import { MyBookmarksPage } from "./pages/my/bookmarks.tsx";
 import { DeveloperPage } from "./pages/developer/index.tsx";
 import { ExplorePage } from "./pages/explore/index.tsx";
 import { OnboardingPage } from "./pages/onboarding/index.tsx";
-import { PostDetailPage } from "./pages/community/PostDetailPage.tsx";
+import { PostDetailPage } from "./pages/community/index.tsx";
 import AuthCallbackPage from "./pages/auth/AuthCallbackPage.tsx";
 import ChatPage from "./pages/chat/index.tsx";
 import SearchPage from "./pages/search/index.tsx";
@@ -58,7 +63,27 @@ const router = createBrowserRouter([
         element: <MyPage />,
       },
       {
-        path: "developer/:id",
+        path: "my/edit",
+        element: <EditProfilePage />,
+      },
+      {
+        path: "my/posts",
+        element: <MyPostsPage />,
+      },
+      {
+        path: "my/history",
+        element: <MyHistoryPage />,
+      },
+      {
+        path: "my/comments",
+        element: <MyCommentsPage />,
+      },
+      {
+        path: "my/bookmarks",
+        element: <MyBookmarksPage />,
+      },
+      {
+        path: "developer/:nickname",
         element: <DeveloperPage />,
       },
       {

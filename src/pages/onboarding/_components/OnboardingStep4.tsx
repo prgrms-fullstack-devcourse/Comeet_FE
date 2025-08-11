@@ -92,7 +92,7 @@ export function OnboardingStep4({ data }: StepProps) {
         sessionId,
         data: requestData,
       });
-      navigate("/board");
+      navigate("/login");
     } catch (error) {
       alert("회원가입에 실패했습니다. 다시 시도해주세요.");
     }
@@ -125,7 +125,7 @@ export function OnboardingStep4({ data }: StepProps) {
           onClick={handleSubmit}
           disabled={signUpMutation.isPending}
           className="w-full bg-brand-primary hover:bg-brand-primary/80 text-black font-bold text-lg py-6">
-          {signUpMutation.isPending ? "처리 중..." : "홈으로"}
+          {signUpMutation.isPending ? "처리 중..." : "로그인하기"}
         </Button>
       </div>
     </div>

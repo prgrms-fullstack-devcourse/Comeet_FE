@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -12,17 +13,33 @@ import { PostItem } from "./PostItem";
 import { RecruitItem } from "./RecruitItem";
 import { useAddPostModal } from "../../../../hooks/useAddPostModal";
 import { useBoards } from "../../../../hooks/queries/usePosts";
+import {
+  usePositionsInterests,
+  useStacks,
+} from "../../../../hooks/queries/useTags";
+import { useLocationQuery } from "../../../../hooks/queries/useLocationQuery";
 
 interface AddPostModalProps {
   onClose: () => void;
-  onSubmit: (data: { title: string; content: string; boardId: number }) => void;
+  onSubmit: (data: {
+    title: string;
+    content: string;
+    boardId: number;
+    location: { lat: number; lng: number };
+  }) => void;
   isSubmitting?: boolean;
+  initialData?: {
+    title: string;
+    content: string;
+    boardId: number;
+  };
 }
 
 export const AddPostModal = ({
   onClose,
   onSubmit,
   isSubmitting = false,
+  initialData,
 }: AddPostModalProps) => {
   const {
     title,
@@ -31,7 +48,9 @@ export const AddPostModal = ({
     description,
     recruitCount,
     position,
+    selectedPositionIds,
     selectedStackIds,
+    location,
     isRecruitBoard,
     setTitle,
     setContent,
@@ -39,11 +58,51 @@ export const AddPostModal = ({
     setDescription,
     setRecruitCount,
     setPosition,
+    setSelectedPositionIds,
     setSelectedStackIds,
+    setLocation,
     reset,
   } = useAddPostModal();
 
   const { data: boards = [] } = useBoards();
+  const { data: positionsInterestsData } = usePositionsInterests();
+  const { data: stacks } = useStacks();
+  const { location: currentLocation, refetchLocation } = useLocationQuery();
+
+  useEffect(() => {
+    if (currentLocation && !location) {
+      setLocation(currentLocation);
+    }
+  }, [currentLocation, location, setLocation]);
+
+  useEffect(() => {
+    if (!location && currentLocation) {
+      setLocation(currentLocation);
+    }
+  }, [location, currentLocation, setLocation]);
+
+  useEffect(() => {
+    if (initialData && !location) {
+      if (currentLocation) {
+        setLocation(currentLocation);
+      } else {
+        refetchLocation().then(() => {
+          console.log("위치 정보 다시 가져오기 완료");
+        });
+      }
+    }
+  }, [initialData, currentLocation, location, setLocation, refetchLocation]);
+
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title);
+      setContent(initialData.content);
+      const board = boards.find((b) => b.id === initialData.boardId);
+      if (board) {
+        setSelectedBoard(board.value);
+      }
+    }
+  }, [initialData, boards]);
 
   const handleSubmit = () => {
     if (!title.trim() || !selectedBoard) {
@@ -51,7 +110,10 @@ export const AddPostModal = ({
     }
 
     if (isRecruitBoard) {
-      if (!description.trim() || !position || selectedStackIds.length === 0) {
+      if (!description.trim() || selectedStackIds.length === 0) {
+        return;
+      }
+      if (selectedBoard === "프로젝트" && selectedPositionIds.length === 0) {
         return;
       }
     } else {
@@ -60,15 +122,41 @@ export const AddPostModal = ({
       }
     }
 
+    if (!location) {
+      alert("위치 정보가 필요합니다. 위치 정보를 설정해주세요.");
+      return;
+    }
+
     const selectedBoardData = boards.find(
       (board) => board.value === selectedBoard
     );
     if (!selectedBoardData) return;
 
+    let finalContent = isRecruitBoard ? description.trim() : content.trim();
+
+    if (isRecruitBoard) {
+      finalContent += `\n\n모집 인원: ${recruitCount}명`;
+      if (selectedBoard === "프로젝트" && selectedPositionIds.length > 0) {
+        const positions = positionsInterestsData?.positions || [];
+        const selectedPositions = positions.filter((pos) =>
+          selectedPositionIds.includes(pos.id)
+        );
+        const positionText = selectedPositions
+          .map((pos) => pos.role)
+          .join(", ");
+        finalContent += `\n포지션: ${positionText}`;
+      }
+      const selectedStacks =
+        stacks?.filter((stack) => selectedStackIds.includes(stack.id)) || [];
+      const stackText = selectedStacks.map((stack) => stack.value).join(", ");
+      finalContent += `\n기술스택: ${stackText}`;
+    }
+
     const postData = {
       title: title.trim(),
-      content: isRecruitBoard ? description.trim() : content.trim(),
+      content: finalContent,
       boardId: selectedBoardData.id,
+      location,
     };
 
     onSubmit(postData);
@@ -78,6 +166,17 @@ export const AddPostModal = ({
     reset();
     onClose();
   };
+
+  const isDisabled =
+    isSubmitting ||
+    !title.trim() ||
+    !selectedBoard ||
+    (isRecruitBoard
+      ? !description.trim() ||
+        selectedStackIds.length === 0 ||
+        (selectedBoard === "프로젝트" && selectedPositionIds.length === 0)
+      : !content.trim()) ||
+    !location;
 
   const footer = (
     <div className="flex items-center gap-2">
@@ -89,14 +188,7 @@ export const AddPostModal = ({
       </Button>
       <Button
         onClick={handleSubmit}
-        disabled={
-          isSubmitting ||
-          !title.trim() ||
-          !selectedBoard ||
-          (isRecruitBoard
-            ? !description.trim() || !position || selectedStackIds.length === 0
-            : !content.trim())
-        }
+        disabled={isDisabled}
         className="flex-1 bg-brand-primary hover:bg-brand-primary/90 font-bold text-base py-6">
         {isSubmitting ? "작성 중..." : "작성하기"}
       </Button>
@@ -106,7 +198,6 @@ export const AddPostModal = ({
   return (
     <ModalWrapper title="게시글 작성" onClose={handleClose} footer={footer}>
       <div className="space-y-6">
-        {/* 게시판 선택 */}
         <div className="space-y-3">
           <Label>게시판</Label>
           <Select value={selectedBoard} onValueChange={setSelectedBoard}>
@@ -125,19 +216,20 @@ export const AddPostModal = ({
             </SelectContent>
           </Select>
         </div>
-
-        {/*포스트, 리크루트 조건부 렌더링*/}
         {isRecruitBoard ? (
           <RecruitItem
             title={title}
             description={description}
             recruitCount={recruitCount}
             position={position}
+            selectedPositionIds={selectedPositionIds}
             selectedStackIds={selectedStackIds}
+            boardValue={selectedBoard}
             onTitleChange={setTitle}
             onDescriptionChange={setDescription}
             onRecruitCountChange={setRecruitCount}
             onPositionChange={setPosition}
+            onPositionIdsChange={setSelectedPositionIds}
             onStackIdsChange={setSelectedStackIds}
           />
         ) : (

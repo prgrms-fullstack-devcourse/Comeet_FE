@@ -9,9 +9,10 @@ interface GlobalLayoutProps {
 function GlobalLayout({ children }: GlobalLayoutProps) {
   const location = useLocation();
 
-  const shouldShowBottomNav = ["/board", "/explore", "/chat", "/my"].some(
-    (path) => location.pathname.startsWith(path)
-  );
+  const shouldShowBottomNav =
+    ["/board", "/explore", "/chat", "/my"].some((path) =>
+      location.pathname.startsWith(path)
+    ) && !location.pathname.startsWith("/my/edit");
 
   return (
     <div className="min-h-screen bg-slate-100 flex justify-center">

@@ -1,68 +1,63 @@
-import type { Comment } from "@/types/community.types";
+import type { CommentResponse } from "@/types/post.types";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle } from "lucide-react";
-import { ReplyItem } from "./ReplyItem";
+import { MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { formatCommentDate } from "@/lib/date";
 
 interface CommentItemProps {
-  comment: Comment;
-  onToggleLike: (commentId: number) => void;
-  onToggleReplyLike: (replyId: number) => void;
+  comment: CommentResponse;
+  onEditClick?: () => void;
+  onDeleteClick?: () => void;
 }
 
 export function CommentItem({
   comment,
-  onToggleLike,
-  onToggleReplyLike,
+  onEditClick,
+  onDeleteClick,
 }: CommentItemProps) {
   return (
-    <div>
-      <div className="p-4 -mx-4 border-b border-brand-surface">
-        <p className="py-2 text-sm leading-relaxed text-white">
-          {comment.content}
-        </p>
+    <div className="p-4 -mx-4 border-b border-brand-surface">
+      <p className="py-2 text-sm leading-relaxed text-white">
+        {comment.content}
+      </p>
 
-        <div className="flex items-center justify-between text-xs text-brand-text">
-          <div className="flex items-center gap-x-2">
-            <span className="font-medium">{comment.author.name}</span>
-            <span>•</span>
-            <span>{comment.createdAt}</span>
-          </div>
-
-          <div className="flex items-center ">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-0 h-auto hover:bg-transparent hover:text-brand-text flex items-center"
-              onClick={() => onToggleLike(comment.id)}>
-              <Heart
-                className="h-4 w-4"
-                fill={comment.isLiked ? "#FF4A4A" : "none"}
-                stroke={comment.isLiked ? "#FF4A4A" : "currentColor"}
-              />
-              <span className="-mt-0.5">{comment.likeCount}</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="p-0 h-auto hover:bg-transparent hover:text-brand-text flex items-center">
-              <MessageCircle className="h-4 w-4" />
-              <span className="-mt-0.5">{comment.replyCount}</span>
-            </Button>
-          </div>
+      <div className="flex items-center justify-between text-xs text-brand-text">
+        <div className="flex items-center gap-x-2">
+          <span className="font-medium">{comment.author.nickname}</span>
+          <span>•</span>
+          <span>{formatCommentDate(comment.createdAt)}</span>
         </div>
+
+        {comment.editable && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 hover:bg-white/10 rounded-full">
+                <MoreHorizontal className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="mr-4 -mt-2 bg-brand-surface border-brand-surface text-white">
+              <DropdownMenuItem
+                onClick={onEditClick}
+                className="hover:bg-brand-primary hover:text-black cursor-pointer">
+                수정
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={onDeleteClick}
+                className="hover:bg-red-500 hover:text-white cursor-pointer">
+                삭제
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
-
-      {comment.replies && comment.replies.length > 0 && (
-        <div className=" border-brand-surface ml-4">
-          {comment.replies.map((reply) => (
-            <ReplyItem
-              key={reply.id}
-              reply={reply}
-              onToggleLike={onToggleReplyLike}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
