@@ -5,7 +5,7 @@ import { usePosts, useCreatePost, useBoards } from "@/hooks/queries/usePosts";
 import { useLocationQuery } from "@/hooks/queries/useLocationQuery";
 import { AppTabs } from "@/components/common/AppTabs";
 import { AddPostModal } from "./_components/modal/AddPostModal";
-import { ListItem } from "./_components/ListItem";
+import { ListItem } from "@/components/common/ListItem";
 import type { UICategory } from "@/constants/board";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
@@ -52,7 +52,12 @@ export const BoardPage = () => {
     navigate("/search");
   };
 
-  const handlePlusClick = () => {
+  const handlePlusClick = async () => {
+    try {
+      await refetchLocation();
+    } catch (error) {
+      console.error("위치 정보 가져오기 실패:", error);
+    }
     setIsModalOpen(true);
   };
 
