@@ -44,7 +44,7 @@ export const usePosts = (category: UICategory) => {
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
     gcTime: 10 * 60 * 1000,
   });
 };
@@ -60,7 +60,7 @@ export const usePostDetail = (postId: string) => {
       return result;
     },
     enabled: !!postId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
     gcTime: 10 * 60 * 1000,
     retry: 1,
   });
@@ -77,7 +77,7 @@ export const useSearchPosts = (query: string) => {
       );
     },
     enabled: !!query && query.trim().length > 0,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 0,
     gcTime: 5 * 60 * 1000,
   });
 };
@@ -98,7 +98,7 @@ export const useComments = (postId: string) => {
     queryKey: ["comments", postId],
     queryFn: () => fetchComments(postId),
     enabled: !!postId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 0,
     gcTime: 5 * 60 * 1000,
   });
 };
@@ -252,23 +252,9 @@ export const useUpdateComment = () => {
       commentId: number;
       content: string;
     }) => updateComment(commentId, { content }),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments"] });
-      queryClient.setQueriesData<CommentResponse[]>(
-        { queryKey: ["comments"] },
-        (oldData: CommentResponse[] | undefined) => {
-          if (!oldData) return oldData;
-          return oldData.map((comment) => {
-            if (comment.id === variables.commentId) {
-              return {
-                ...comment,
-                content: variables.content,
-              };
-            }
-            return comment;
-          });
-        }
-      );
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
 };
@@ -281,16 +267,6 @@ export const useDeleteComment = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments"] });
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.setQueriesData<PostDetailItem>(
-        { queryKey: ["post"] },
-        (oldData: PostDetailItem | undefined) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            nComments: Math.max((oldData.nComments || 0) - 1, 0),
-          };
-        }
-      );
     },
   });
 };
